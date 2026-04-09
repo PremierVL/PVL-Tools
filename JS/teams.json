@@ -18,5 +18,5 @@
   { "id": "sun", "team": "Liverpool FC", "dropbox_dir": "https://dl.dropbox.com/scl/fi/5wc0u3zmf85pncch0l477/liv.txt?rlkey=9znx60syts0hyoxxs5af51gea&dl=0" },
   { "id": "tot", "team": "Olympique Marsella", "dropbox_dir": "https://dl.dropbox.com/scl/fi/ybxw7yccna06pom5r2wya/mar.txt?rlkey=umf1xfrsepyvng9jblsasqmti&dl=0" },
   { "id": "wha", "team": "Manchester City", "dropbox_dir": "https://dl.dropbox.com/scl/fi/j0k2sge69sq3q91eu25gh/mci.txt?rlkey=t45u4xxpphaw49w267wkpt21s&dl=0" },
-  { "id": "wol", "team": "AC Milan", "dropbox_dir": "https://dl.dropbox.com/scl/fi/yjrsmggg3ugan4ixox3lp/mil.txt?rlkey=6s180qpdcwivlp091h66pckn4&dl=0" },
+  { "id": "wol", "team": "AC Milan", "dropbox_dir": "https://dl.dropbox.com/scl/fi/yjrsmggg3ugan4ixox3lp/mil.txt?rlkey=6s180qpdcwivlp091h66pckn4&dl=0" }
 ]
