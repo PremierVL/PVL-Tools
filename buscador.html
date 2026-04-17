@@ -34,12 +34,17 @@
       background: #222;
     }
   </style>
+  <link rel="stylesheet" href="./css/main.css">
 </head>
 <body>
 
-<h1>🔎 Buscador PVL</h1>
+<h1>🔎 PVL Global Player Search</h1>
 
-<input type="text" id="search" placeholder="Buscar jugador, nacionalidad..." />
+<input 
+  type="text" 
+  id="search" 
+  placeholder="Ej: mitoma | st>10 age<23 | nat=bra"
+/>
 
 <table>
   <thead>
@@ -52,10 +57,15 @@
       <th>TK</th>
       <th>PS</th>
       <th>SH</th>
+      <th>KAb</th>
+      <th>TAb</th>
+      <th>PAb</th>
+      <th>SAb</th>
     </tr>
   </thead>
   <tbody id="results"></tbody>
 </table>
+
 
 <script src="./JS/buscador.js"></script>
 
