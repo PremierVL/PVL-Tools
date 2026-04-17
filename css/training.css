@@ -1,6 +1,5 @@
 body{
     font-family: Arial, Helvetica, sans-serif;
-    background:#f4f6f9;
     margin:0;
     padding:40px;
     color:#333;
@@ -40,7 +39,7 @@ h3{
     border:1px solid #e6e9ef;
     padding:15px;
     border-radius:8px;
-    margin-bottom:15px;
+    margin-bottom:6px;
 }
 
 .training-row{
@@ -50,6 +49,10 @@ h3{
 
 .training-row select{
     width:100%;
+}
+
+section {
+  white-space: normal !important;
 }
 
 button{
@@ -70,7 +73,7 @@ button:hover{
 }
 
 #resultado{
-    margin-top:20px;
+    margin-top:6px;
     text-align:center;
 }
 
