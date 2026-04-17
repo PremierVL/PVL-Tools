@@ -3,6 +3,7 @@ const TEAMS_URL = "https://premiervl.github.io/PVL-Tools/JS/teams.json";
 let allPlayers = [];
 
 const filters = {
+  name: "",
   team: "all",
   nat: "all",
   position: "all",
@@ -39,20 +40,34 @@ function parseTeam(txt, teamName) {
 
 // ---------------- LOAD ----------------
 async function loadData() {
-  const teams = await fetch(TEAMS_URL).then(r => r.json());
+  try {
+    const teams = await fetch(TEAMS_URL).then(r => r.json());
 
-  for (const t of teams) {
-    const txt = await fetch(t.dropbox_dir).then(r => r.text());
-    allPlayers.push(...parseTeam(txt, t.team));
+    for (const t of teams) {
+      const txt = await fetch(t.dropbox_dir).then(r => r.text());
+      allPlayers.push(...parseTeam(txt, t.team));
+    }
+
+    // Mostrar controles y tabla después de cargar
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('controls').style.display = 'block';
+    document.getElementById('tableContainer').style.display = 'table';
+
+    buildFilters();
+    update();
+  } catch (error) {
+    document.getElementById('loading').innerHTML = '❌ Error al cargar datos';
+    console.error('Error loading data:', error);
   }
-
-  buildFilters();
-  update();
 }
 
 // ---------------- FILTER CORE ----------------
 function filterPlayers() {
   return allPlayers.filter(p => {
+    // Filtro por nombre
+    if (filters.name && !p.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
+    }
 
     if (filters.team !== "all" && p.team !== filters.team) return false;
     if (filters.nat !== "all" && p.nat !== filters.nat) return false;
@@ -77,21 +92,25 @@ function matchPosition(p, pos) {
 }
 
 // ---------------- UI ACTIONS ----------------
-function setPos(p) {
-  filters.position = p;
+function setPos(pos) {
+  filters.position = pos;
+  updatePositionButtons();
   update();
 }
 
 function resetFilters() {
+  filters.name = "";
   filters.team = "all";
   filters.nat = "all";
   filters.position = "all";
   filters.ageMin = 16;
   filters.ageMax = 40;
 
+  document.getElementById("nameSearch").value = "";
   document.getElementById("ageMin").value = 16;
   document.getElementById("ageMax").value = 40;
 
+  updatePositionButtons();
   update();
 }
 
@@ -100,8 +119,8 @@ function buildFilters() {
   const teamSel = document.getElementById("teamFilter");
   const natSel = document.getElementById("natFilter");
 
-  const teams = [...new Set(allPlayers.map(p => p.team))];
-  const nats = [...new Set(allPlayers.map(p => p.nat))];
+  const teams = [...new Set(allPlayers.map(p => p.team))].sort();
+  const nats = [...new Set(allPlayers.map(p => p.nat))].sort();
 
   teamSel.innerHTML = `<option value="all">Todos equipos</option>` +
     teams.map(t => `<option value="${t}">${t}</option>`).join("");
@@ -119,31 +138,64 @@ function buildFilters() {
     update();
   };
 
+  // Name search
+  document.getElementById("nameSearch").oninput = e => {
+    filters.name = e.target.value;
+    update();
+  };
+
+  // Age sliders
   const ageMin = document.getElementById("ageMin");
   const ageMax = document.getElementById("ageMax");
 
   ageMin.oninput = ageMax.oninput = () => {
     filters.ageMin = +ageMin.value;
     filters.ageMax = +ageMax.value;
-    document.getElementById("ageLabel").innerText =
-      `${filters.ageMin} - ${filters.ageMax}`;
+    document.getElementById("ageLabel").innerText = `${filters.ageMin} - ${filters.ageMax}`;
     update();
   };
 
   ageMin.value = 16;
   ageMax.value = 40;
+  document.getElementById("ageLabel").innerText = "16 - 40";
+
+  // Position buttons
+  document.querySelectorAll('.btn-pos').forEach(btn => {
+    btn.onclick = () => setPos(btn.dataset.pos);
+  });
+
+  updatePositionButtons();
+}
+
+function updatePositionButtons() {
+  document.querySelectorAll('.btn-pos').forEach(btn => {
+    btn.classList.remove('btn-active');
+    if (btn.dataset.pos === filters.position) {
+      btn.classList.add('btn-active');
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+    } else {
+      btn.classList.remove('btn-primary');
+      btn.classList.add('btn-secondary');
+    }
+  });
 }
 
 // ---------------- RENDER ----------------
 function render(players) {
   const tbody = document.getElementById("results");
 
+  if (players.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="12" class="no-results">No se encontraron jugadores</td></tr>';
+    return;
+  }
+
   tbody.innerHTML = players.slice(0, 200).map(p => `
     <tr>
       <td>${p.name}</td>
       <td>${p.team}</td>
       <td>${p.age}</td>
-      <td><img href="./images/countries/${p.nat}" alt="${p.nat}"</td>
+      <td>${p.nat}</td>
       <td>${p.st}</td>
       <td>${p.tk}</td>
       <td>${p.ps}</td>
@@ -158,7 +210,8 @@ function render(players) {
 
 // ---------------- UPDATE ----------------
 function update() {
-  render(filterPlayers());
+  const players = filterPlayers();
+  render(players);
 }
 
 // ---------------- INIT ----------------
