@@ -188,7 +188,7 @@ btnEnviar.onclick = async () => {
   resultado.innerHTML = "🔄 Enviando..."
 
   try {
-    const res = await fetch("https://esmsubed.duckdns.org/training", {  // ← Sin /api/
+    const res = await fetch("https://esmsubed.duckdns.org/api/training", {  // ← Sin /api/
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload)
