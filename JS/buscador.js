@@ -143,7 +143,7 @@ function render(players) {
       <td>${p.name}</td>
       <td>${p.team}</td>
       <td>${p.age}</td>
-      <td>${p.nat}</td>
+      <td><img href="./images/countries/${p.nat}" alt="${p.nat}"</td>
       <td>${p.st}</td>
       <td>${p.tk}</td>
       <td>${p.ps}</td>
