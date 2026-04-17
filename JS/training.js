@@ -6,8 +6,13 @@ const btnEnviar = document.getElementById("btnEnviar")
 let equiposData = []
 let jugadoresPorEquipo = {} // Cache de jugadores
 
+
 const tiposEntreno = [
-  "Físico", "Táctico", "Tiro", "Defensa", "Recuperación"
+  { texto: "Regate", value: "rg" },
+  { texto: "Tiro", value: "ti" },
+  { texto: "Defensa", value: "df" },
+  { texto: "Pase", value: "ps" },
+  { texto: "Porteria", value: "po" }
 ]
 
 /* =========================
@@ -79,7 +84,7 @@ function crearEntrenamientos() {
         </select>
         <select id="tipo_${i}">
           <option value="">-- Tipo --</option>
-          ${tiposEntreno.map(t => `<option value="${t}">${t}</option>`).join("")}
+	  ${tiposEntreno.map(t => `<option value="${t.value}">${t.texto}</option>`).join("")}
         </select>
       </div>
     `
