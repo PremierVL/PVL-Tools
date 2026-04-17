@@ -36,14 +36,34 @@
 
 </section>
 
-<!-- AGREGAR ESTO -->
-<div style="margin: 15px 0;">
-  <label>PIN del equipo: </label>
-  <input type="password" id="pinInput" placeholder="1234" maxlength="9" style="padding:5px;width:100px;">
-</div>
-<button id="btnEnviar">📤 Enviar Entrenamientos</button>
+<!-- MODAL PIN ACTUAL -->
+
+<div id="pinModal" class="modal">
+
+<div class="modal-content">
+
+<h3>🔐 Introduce el PIN actual</h3>
+
+<input type="password" id="pinActual" placeholder="PIN actual">
+
+  <div id="pinModal" class="modal">
+  <div class="modal-content">
+
+    <h3>🔐 Introduce el PIN</h3>
+
+    <input type="password" id="teamPin" placeholder="PIN del equipo">
+
+    <div class="modal-buttons">
+      <button id="confirmPin">Confirmar</button>
+      <button id="cancelPin">Cancelar</button>
+    </div>
+
+    <div id="pinError"></div>
+
+  </div>
 
 <script type="module" src="./JS/training.js"></script>
+<script type="module" src="./JS/sendSht.js"></script>
 
 </body>
 </html>
