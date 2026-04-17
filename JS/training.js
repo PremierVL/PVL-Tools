@@ -14,6 +14,17 @@ const tiposEntreno = [
 ]
 
 /* =========================
+   LOADING MSG
+========================= */
+
+const loadingMsg = document.createElement("div")
+loadingMsg.style.margin = "10px 0"
+loadingMsg.style.color = "#666"
+loadingMsg.style.display = "none"
+loadingMsg.innerText = "🔄 Cargando jugadores..."
+container.parentNode.insertBefore(loadingMsg, container)
+
+/* =========================
    CARGAR EQUIPOS
 ========================= */
 
@@ -30,12 +41,10 @@ equipos.forEach(e => {
   dropdown.appendChild(opt)
 })
 
-crearEntrenamientos()
-
 })
 
 /* =========================
-   CREAR 5 ENTRENAMIENTOS
+   CREAR ENTRENAMIENTOS
 ========================= */
 
 function crearEntrenamientos(){
@@ -46,7 +55,6 @@ for(let i=1;i<=5;i++){
 
 const div = document.createElement("div")
 div.className = "training-block"
-div.style.marginBottom = "15px"
 
 div.innerHTML = `
 <h3>Entrenamiento ${i}</h3>
@@ -69,13 +77,35 @@ container.appendChild(div)
 }
 
 /* =========================
-   CUANDO CAMBIA EQUIPO
+   CAMBIO DE EQUIPO
 ========================= */
 
-dropdown.onchange = () => {
+dropdown.onchange = async () => {
 
 const equipo = equiposData.find(e => e.id === dropdown.value)
 
+// ❌ sin equipo → limpiar todo
+if(!equipo){
+container.innerHTML = ""
+return
+}
+
+// ✔ crear estructura
+crearEntrenamientos()
+
+// 🔄 loading
+loadingMsg.style.display = "block"
+
+// limpiar selects
+for(let i=1;i<=5;i++){
+const sel = document.getElementById(`jugador_${i}`)
+if(sel) sel.innerHTML = `<option value="">-- Jugador --</option>`
+}
+
+// pequeña UX delay
+await new Promise(r => setTimeout(r, 300))
+
+// ✔ cargar jugadores
 for(let i=1;i<=5;i++){
 
 const jugadorSelect = document.getElementById(`jugador_${i}`)
@@ -93,6 +123,8 @@ equipo.players.forEach(p => {
 }
 
 }
+
+loadingMsg.style.display = "none"
 
 }
 
@@ -136,15 +168,13 @@ body: JSON.stringify({
 const data = await res.json()
 
 if(res.ok){
-resultado.innerHTML = "✔ Entrenamiento guardado correctamente"
+resultado.innerHTML = `<div class="success">✔ Entrenamiento guardado correctamente</div>`
 }else{
-resultado.innerHTML = "❌ " + (data.error || "Error")
+resultado.innerHTML = `<div class="error">❌ ${data.error || "Error"}</div>`
 }
 
 }catch(e){
-
-resultado.innerHTML = "❌ Error de conexión"
-
+resultado.innerHTML = `<div class="error">❌ Error de conexión</div>`
 }
 
 }
