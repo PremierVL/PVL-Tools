@@ -4,10 +4,15 @@ const resultado = document.getElementById("resultado")
 const btnEnviar = document.getElementById("btnEnviar")
 
 let equiposData = []
-let jugadoresPorEquipo = {}
+let jugadoresPorEquipo = {} // Cache de jugadores
+
 
 const tiposEntreno = [
-  "Regate (rg)", "Tiro (ti)", "Defensa (df)", "Pase (ps)", "Porteria (po)"
+  { texto: "Regate", value: "rg" },
+  { texto: "Tiro", value: "ti" },
+  { texto: "Defensa", value: "df" },
+  { texto: "Pase", value: "ps" },
+  { texto: "Porteria", value: "po" }
 ]
 
 /* =========================
@@ -44,16 +49,17 @@ async function cargarJugadoresDropbox(dropboxUrl) {
   try {
     const response = await fetch(dropboxUrl)
     const texto = await response.text()
-
+    
+    // Saltar primeras 2 líneas (header)
     const lineas = texto.split('\n').slice(2)
-
+    
     return lineas
       .filter(linea => linea.trim())
       .map(linea => {
         const partes = linea.trim().split(/\s+/)
-        return partes[0]
+        return partes[0] // Solo el nombre (primera columna)
       })
-      .filter(nombre => nombre)
+      .filter(nombre => nombre) // Filtrar vacíos
   } catch (error) {
     console.error('Error cargando jugadores de Dropbox:', dropboxUrl, error)
     return []
@@ -78,11 +84,7 @@ function crearEntrenamientos() {
         </select>
         <select id="tipo_${i}">
           <option value="">-- Tipo --</option>
-          ${tiposEntreno.map(t => {
-            const [texto, value] = t.split('(')
-            const valor = value ? value.slice(0, -1) : texto.trim()
-            return `<option value="${valor}">${texto.trim()}</option>`
-          }).join("")}
+	  ${tiposEntreno.map(t => `<option value="${t.value}">${t.texto}</option>`).join("")}
         </select>
       </div>
     `
@@ -91,11 +93,12 @@ function crearEntrenamientos() {
 }
 
 /* =========================
-   CAMBIO DE EQUIPO
+   CAMBIO DE EQUIPO - CORREGIDO
 ========================= */
 dropdown.onchange = async () => {
   const equipoId = dropdown.value
 
+  // Sin equipo → limpiar
   if(!equipoId) {
     container.innerHTML = ""
     return
@@ -104,11 +107,13 @@ dropdown.onchange = async () => {
   const equipo = equiposData.find(e => e.id === equipoId)
   if(!equipo) return
 
+  // Crear estructura
   crearEntrenamientos()
   loadingMsg.style.display = "block"
   loadingMsg.innerText = "📥 Cargando jugadores del equipo..."
 
   try {
+    // ¿Ya tenemos cache?
     if (!jugadoresPorEquipo[equipoId]) {
       loadingMsg.innerText = "🌐 Descargando lista de jugadores..."
       const jugadores = await cargarJugadoresDropbox(equipo.dropbox_dir)
@@ -117,6 +122,7 @@ dropdown.onchange = async () => {
 
     const players = jugadoresPorEquipo[equipoId]
 
+    // Rellenar TODOS los dropdowns
     for(let i = 1; i <= 5; i++) {
       const jugadorSelect = document.getElementById(`jugador_${i}`)
       jugadorSelect.innerHTML = `<option value="">-- Selecciona jugador --</option>`
@@ -144,7 +150,7 @@ dropdown.onchange = async () => {
 }
 
 /* =========================
-   ENVIAR DATOS A API - CON LOGS COMPLETOS
+   ENVIAR DATOS A API
 ========================= */
 btnEnviar.onclick = async () => {
   const equipoId = dropdown.value
@@ -177,36 +183,36 @@ btnEnviar.onclick = async () => {
   console.log('🔥 === DEBUG API ===')
   console.log('Equipo ID:', equipoId)
   console.log('Entrenamientos:', entrenamientos)
-  const payload = {
+  console.log('Payload completo:')
+  console.log(JSON.stringify({
     equipo: equipoId,
     entrenamientos
-  }
-  console.log('Payload JSON:')
-  console.log(JSON.stringify(payload, null, 2))
+  }, null, 2))
   console.log('====================')
 
   resultado.innerHTML = "🔄 Enviando..."
 
   try {
-    const res = await fetch("https://esmsubed.duckdns.org/training", {  // ← Sin /api/
+    const res = await fetch("https://esmsubed.duckdns.org/api/training", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        equipo: equipoId,
+        entrenamientos
+      })
     })
 
     const data = await res.json()
-    
+
+    // 🔥 LOG RESPUESTA - CORREGIDO
     console.log('📡 Respuesta API:', data)
-    console.log('Status:', res.status, res.statusText)
-    
+    console.log('Status:', res.status, res.statusText)  // ✅ PARÉNTESIS CORREGIDOS
+
     if(res.ok) {
-      resultado.innerHTML = `<div style="color:#10b981;font-weight:bold;">✔️ Entrenamiento guardado correctamente<br><small>${data.archivo}</small></div>`
+      resultado.innerHTML = `<div style="color:#10b981;font-weight:bold;">✔️ Entrenamiento guardado correctamente</div>`
       // Reset form
-      setTimeout(() => {
-        dropdown.value = ""
-        container.innerHTML = ""
-        resultado.innerHTML = ""
-      }, 2000)
+      dropdown.value = ""
+      container.innerHTML = ""
     } else {
       resultado.innerHTML = `<div style="color:#ef4444;">❌ ${data.error || "Error desconocido"}</div>`
     }
