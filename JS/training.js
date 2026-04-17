@@ -45,19 +45,22 @@ container.innerHTML = ""
 for(let i=1;i<=5;i++){
 
 const div = document.createElement("div")
+div.className = "training-block"
 div.style.marginBottom = "15px"
 
 div.innerHTML = `
 <h3>Entrenamiento ${i}</h3>
 
-<select id="jugador_${i}">
-  <option value="">-- Jugador --</option>
-</select>
+<div class="training-row">
+  <select id="jugador_${i}">
+    <option value="">-- Jugador --</option>
+  </select>
 
-<select id="tipo_${i}">
-  <option value="">-- Tipo --</option>
-  ${tiposEntreno.map(t => `<option value="${t}">${t}</option>`).join("")}
-</select>
+  <select id="tipo_${i}">
+    <option value="">-- Tipo --</option>
+    ${tiposEntreno.map(t => `<option value="${t}">${t}</option>`).join("")}
+  </select>
+</div>
 `
 
 container.appendChild(div)
