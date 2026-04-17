@@ -174,6 +174,17 @@ btnEnviar.onclick = async () => {
     return
   }
 
+  // 🔥 LOGS COMPLETOS PARA DEBUG
+  console.log('🔥 === DEBUG API ===')
+  console.log('Equipo ID:', equipoId)
+  console.log('Entrenamientos:', entrenamientos)
+  console.log('Payload completo:')
+  console.log(JSON.stringify({
+    equipo: equipoId,
+    entrenamientos
+  }, null, 2))
+  console.log('====================')
+
   resultado.innerHTML = "🔄 Enviando..."
 
   try {
@@ -187,9 +198,11 @@ btnEnviar.onclick = async () => {
     })
 
     const data = await res.json()
-    // 🔥 LOG RESPUESTA
+
+    // 🔥 LOG RESPUESTA - CORREGIDO
     console.log('📡 Respuesta API:', data)
-    console.log('Status:', res.status, res.statusText
+    console.log('Status:', res.status, res.statusText)  // ✅ PARÉNTESIS CORREGIDOS
+
     if(res.ok) {
       resultado.innerHTML = `<div style="color:#10b981;font-weight:bold;">✔️ Entrenamiento guardado correctamente</div>`
       // Reset form
@@ -199,6 +212,7 @@ btnEnviar.onclick = async () => {
       resultado.innerHTML = `<div style="color:#ef4444;">❌ ${data.error || "Error desconocido"}</div>`
     }
   } catch(e) {
+    console.error('💥 Error completo:', e)
     resultado.innerHTML = `<div style="color:#ef4444;">❌ Error de conexión: ${e.message}</div>`
   }
 }
