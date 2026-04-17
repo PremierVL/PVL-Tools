@@ -148,8 +148,15 @@ dropdown.onchange = async () => {
 ========================= */
 btnEnviar.onclick = async () => {
   const equipoId = dropdown.value
+  const pin = document.getElementById('pinInput').value  // ← NUEVO
+
   if(!equipoId) {
     alert("⚠️ Selecciona un equipo primero")
+    return
+  }
+
+  if(!pin) {
+    alert("⚠️ Ingresa el PIN del equipo")
     return
   }
 
@@ -164,7 +171,6 @@ btnEnviar.onclick = async () => {
       hayErrores = true
       break
     }
-
     entrenamientos.push({ jugador, tipo })
   }
 
@@ -173,37 +179,34 @@ btnEnviar.onclick = async () => {
     return
   }
 
-  // 🔥 LOGS COMPLETOS PARA DEBUG
-  console.log('🔥 === DEBUG API ===')
-  console.log('Equipo ID:', equipoId)
-  console.log('Entrenamientos:', entrenamientos)
+  // 🔥 PAYLOAD CON PIN
   const payload = {
     equipo: equipoId,
-    entrenamientos
+    entrenamientos,
+    pin: pin  // ← AGREGAR PIN
   }
-  console.log('Payload JSON:')
-  console.log(JSON.stringify(payload, null, 2))
-  console.log('====================')
+
+  console.log('🔥 Enviando:', payload)
 
   resultado.innerHTML = "🔄 Enviando..."
 
   try {
-    const res = await fetch("https://esmsubed.duckdns.org/api/training", {  // ← Sin /api/
+    const res = await fetch("https://esmsubed.duckdns.org/api/training", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(payload)
     })
 
     const data = await res.json()
-    
-    console.log('📡 Respuesta API:', data)
-    console.log('Status:', res.status, res.statusText)
-    
+
+    console.log('📡 Respuesta:', data)
+
     if(res.ok) {
-      resultado.innerHTML = `<div style="color:#10b981;font-weight:bold;">✔️ Entrenamiento guardado correctamente<br><small>${data.archivo}</small></div>`
-      // Reset form
+      resultado.innerHTML = `<div style="color:#10b981;font-weight:bold;">✔️ ${data.message}<br><small>${data.archivo}</small></div>`
+      // Reset
       setTimeout(() => {
         dropdown.value = ""
+        document.getElementById('pinInput').value = ""
         container.innerHTML = ""
         resultado.innerHTML = ""
       }, 2000)
@@ -211,7 +214,7 @@ btnEnviar.onclick = async () => {
       resultado.innerHTML = `<div style="color:#ef4444;">❌ ${data.error || "Error desconocido"}</div>`
     }
   } catch(e) {
-    console.error('💥 Error completo:', e)
-    resultado.innerHTML = `<div style="color:#ef4444;">❌ Error de conexión: ${e.message}</div>`
+    console.error('💥 Error:', e)
+    resultado.innerHTML = `<div style="color:#ef4444;">❌ Error conexión: ${e.message}</div>`
   }
 }
