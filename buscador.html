@@ -1,71 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>PVL Player Search</title>
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-  <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: #eee;
-      padding: 20px;
-    }
+<meta charset="UTF-8">
+<title>Scouting Dashboard</title>
 
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
+<style>
+  body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    margin: 0;
+    padding: 20px;
+  }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+  h1 {
+    margin-bottom: 10px;
+  }
 
-    th, td {
-      padding: 8px;
-      border-bottom: 1px solid #333;
-      text-align: left;
-    }
+  .panel {
+    background: #111c33;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
 
-    tr:hover {
-      background: #222;
-    }
-  </style>
-  <link rel="stylesheet" href="./css/main.css">
+  select, input, button {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  button {
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+  }
+
+  button:hover {
+    background: #1d4ed8;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th, td {
+    padding: 6px;
+    border-bottom: 1px solid #223;
+    text-align: center;
+  }
+
+  th {
+    background: #1e293b;
+  }
+
+  tr:hover {
+    background: #1b2a44;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+</style>
 </head>
+
 <body>
 
-<h1>🔎 PVL Global Player Search</h1>
+<h1>🔎 Scouting Dashboard</h1>
 
-<input 
-  type="text" 
-  id="search" 
-  placeholder="Ej: mitoma | st>10 age<23 | nat=bra"
-/>
+<div class="panel">
+
+  <div class="row">
+    <select id="teamFilter"></select>
+    <select id="natFilter"></select>
+  </div>
+
+  <div class="row">
+    <button onclick="setPos('all')">Todos</button>
+    <button onclick="setPos('GK')">GK</button>
+    <button onclick="setPos('DF')">DF</button>
+    <button onclick="setPos('MF')">MF</button>
+    <button onclick="setPos('FW')">FW</button>
+    <button onclick="resetFilters()">Reset</button>
+  </div>
+
+  <div class="row">
+    Edad:
+    <input type="range" id="ageMin" min="16" max="40">
+    <input type="range" id="ageMax" min="16" max="40">
+    <span id="ageLabel"></span>
+  </div>
+
+</div>
 
 <table>
-  <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Equipo</th>
-      <th>Edad</th>
-      <th>NAT</th>
-      <th>ST</th>
-      <th>TK</th>
-      <th>PS</th>
-      <th>SH</th>
-      <th>KAb</th>
-      <th>TAb</th>
-      <th>PAb</th>
-      <th>SAb</th>
-    </tr>
-  </thead>
-  <tbody id="results"></tbody>
-</table>
+<thead>
+<tr>
+  <th>Nombre</th>
+  <th>Equipo</th>
+  <th>Edad</th>
+  <th>NAT</th>
+  <th>ST</th>
+  <th>TK</th>
+  <th>PS</th>
+  <th>SH</th>
+  <th>KAb</th>
+  <th>TAb</th>
+  <th>PAb</th>
+  <th>SAb</th>
+</tr>
+</thead>
 
+<tbody id="results"></tbody>
+</table>
 
 <script src="./JS/buscador.js"></script>
 

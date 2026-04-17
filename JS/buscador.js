@@ -2,146 +2,163 @@ const TEAMS_URL = "https://premiervl.github.io/PVL-Tools/JS/teams.json";
 
 let allPlayers = [];
 
+const filters = {
+  team: "all",
+  nat: "all",
+  position: "all",
+  ageMin: 16,
+  ageMax: 40
+};
+
 // ---------------- PARSER ----------------
 function parseTeam(txt, teamName) {
   const lines = txt.split("\n").slice(2);
 
   return lines
-    .filter(line => line.trim() !== "")
-    .map(line => {
-      const p = line.trim().split(/\s+/);
+    .filter(l => l.trim())
+    .map(l => {
+      const p = l.trim().split(/\s+/);
 
       return {
         name: p[0],
         age: +p[1],
         nat: p[2],
-
         st: +p[3],
         tk: +p[4],
         ps: +p[5],
         sh: +p[6],
         ag: +p[7],
-
         kab: +p[8],
         tab: +p[9],
         pab: +p[10],
         sab: +p[11],
-
-        team: teamName,
-        rating: +p[3] + +p[4] + +p[5] + +p[6]
+        team: teamName
       };
     });
 }
 
-// ---------------- LOAD DATA ----------------
+// ---------------- LOAD ----------------
 async function loadData() {
-  // CACHE
-  if (localStorage.getItem("players")) {
-    allPlayers = JSON.parse(localStorage.getItem("players"));
-    render(allPlayers);
-    return;
-  }
-
   const teams = await fetch(TEAMS_URL).then(r => r.json());
 
-  for (const team of teams) {
-    try {
-      const txt = await fetch(team.dropbox_dir).then(r => r.text());
-      const players = parseTeam(txt, team.team);
-      allPlayers.push(...players);
-    } catch (err) {
-      console.error("Error con", team.team);
-    }
+  for (const t of teams) {
+    const txt = await fetch(t.dropbox_dir).then(r => r.text());
+    allPlayers.push(...parseTeam(txt, t.team));
   }
 
-  localStorage.setItem("players", JSON.stringify(allPlayers));
-
-  render(allPlayers);
+  buildFilters();
+  update();
 }
 
-// ---------------- FILTER ENGINE ----------------
-function applyFilter(p, f) {
-  // >
-  if (f.includes(">")) {
-    const [key, val] = f.split(">");
-    return +p[key] > +val;
-  }
+// ---------------- FILTER CORE ----------------
+function filterPlayers() {
+  return allPlayers.filter(p => {
 
-  // <
-  if (f.includes("<")) {
-    const [key, val] = f.split("<");
-    return +p[key] < +val;
-  }
+    if (filters.team !== "all" && p.team !== filters.team) return false;
+    if (filters.nat !== "all" && p.nat !== filters.nat) return false;
 
-  // =
-  if (f.includes("=")) {
-    const [key, val] = f.split("=");
+    if (p.age < filters.ageMin || p.age > filters.ageMax) return false;
 
-    if (key === "nat") {
-      return p.nat.toLowerCase() === val;
+    if (filters.position !== "all") {
+      if (!matchPosition(p, filters.position)) return false;
     }
 
-    return p[key] == val;
-  }
-
-  // búsqueda texto
-  return (
-    p.name.toLowerCase().includes(f) ||
-    p.team.toLowerCase().includes(f) ||
-    p.nat.toLowerCase().includes(f)
-  );
+    return true;
+  });
 }
 
-// ---------------- SEARCH ----------------
-document.getElementById("search").addEventListener("input", e => {
-  const q = e.target.value.trim().toLowerCase();
+// ---------------- POSITIONS ----------------
+function matchPosition(p, pos) {
+  if (pos === "GK") return p.st <= 2;
+  if (pos === "DF") return p.tk >= 10;
+  if (pos === "MF") return p.ps >= 10;
+  if (pos === "FW") return p.sh >= 10;
+  return true;
+}
 
-  if (!q) {
-    render(allPlayers);
-    return;
-  }
+// ---------------- UI ACTIONS ----------------
+function setPos(p) {
+  filters.position = p;
+  update();
+}
 
-  const filters = q.split(" ");
+function resetFilters() {
+  filters.team = "all";
+  filters.nat = "all";
+  filters.position = "all";
+  filters.ageMin = 16;
+  filters.ageMax = 40;
 
-  const results = allPlayers.filter(p =>
-    filters.every(f => applyFilter(p, f))
-  );
+  document.getElementById("ageMin").value = 16;
+  document.getElementById("ageMax").value = 40;
 
-  render(results);
-});
+  update();
+}
 
-// ---------------- COLOR STATS ----------------
-function colorStat(val) {
-  if (val >= 12) return "good";
-  if (val >= 8) return "mid";
-  return "bad";
+// ---------------- BUILD FILTERS ----------------
+function buildFilters() {
+  const teamSel = document.getElementById("teamFilter");
+  const natSel = document.getElementById("natFilter");
+
+  const teams = [...new Set(allPlayers.map(p => p.team))];
+  const nats = [...new Set(allPlayers.map(p => p.nat))];
+
+  teamSel.innerHTML = `<option value="all">Todos equipos</option>` +
+    teams.map(t => `<option value="${t}">${t}</option>`).join("");
+
+  natSel.innerHTML = `<option value="all">Todos países</option>` +
+    nats.map(n => `<option value="${n}">${n}</option>`).join("");
+
+  teamSel.onchange = e => {
+    filters.team = e.target.value;
+    update();
+  };
+
+  natSel.onchange = e => {
+    filters.nat = e.target.value;
+    update();
+  };
+
+  const ageMin = document.getElementById("ageMin");
+  const ageMax = document.getElementById("ageMax");
+
+  ageMin.oninput = ageMax.oninput = () => {
+    filters.ageMin = +ageMin.value;
+    filters.ageMax = +ageMax.value;
+    document.getElementById("ageLabel").innerText =
+      `${filters.ageMin} - ${filters.ageMax}`;
+    update();
+  };
+
+  ageMin.value = 16;
+  ageMax.value = 40;
 }
 
 // ---------------- RENDER ----------------
 function render(players) {
   const tbody = document.getElementById("results");
 
-  tbody.innerHTML = players
-    .slice(0, 100)
-    .map(p => `
-      <tr>
-        <td>${p.name}</td>
-        <td>${p.team}</td>
-        <td>${p.age}</td>
-        <td>${p.nat}</td>
+  tbody.innerHTML = players.slice(0, 200).map(p => `
+    <tr>
+      <td>${p.name}</td>
+      <td>${p.team}</td>
+      <td>${p.age}</td>
+      <td>${p.nat}</td>
+      <td>${p.st}</td>
+      <td>${p.tk}</td>
+      <td>${p.ps}</td>
+      <td>${p.sh}</td>
+      <td>${p.kab}</td>
+      <td>${p.tab}</td>
+      <td>${p.pab}</td>
+      <td>${p.sab}</td>
+    </tr>
+  `).join("");
+}
 
-        <td class="${colorStat(p.st)}">${p.st}</td>
-        <td class="${colorStat(p.tk)}">${p.tk}</td>
-        <td class="${colorStat(p.ps)}">${p.ps}</td>
-        <td class="${colorStat(p.sh)}">${p.sh}</td>
-
-        <td>${p.kab}</td>
-        <td>${p.tab}</td>
-        <td>${p.pab}</td>
-        <td>${p.sab}</td>
-      </tr>
-    `)
-    .join("");
+// ---------------- UPDATE ----------------
+function update() {
+  render(filterPlayers());
 }
 
 // ---------------- INIT ----------------
