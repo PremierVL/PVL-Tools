@@ -10,7 +10,9 @@ const filters = {
   position: "all",
   ageMin: 16, ageMax: 40,
   stMin: 0, stMax: 20,
-  tkMin: 0, tkMax: 20
+  tkMin: 0, tkMax: 20,
+  psMin: 0, psMax: 20,
+  shMin: 0, shMax: 20
 };
 
 // ---------------- PARSER ----------------
@@ -41,28 +43,14 @@ function parseTeam(txt, teamName) {
 // ---------------- LOAD ----------------
 async function loadData() {
   try {
-    document.getElementById('loading').innerHTML = `
-      <div class="spinner"></div>
-      <div>Cargando equipos...</div>
-    `;
-    
     const teams = await fetch(TEAMS_URL).then(r => r.json());
     
     for (let i = 0; i < teams.length; i++) {
       const t = teams[i];
       const txt = await fetch(t.dropbox_dir).then(r => r.text());
       allPlayers.push(...parseTeam(txt, t.team));
-      
-      // Update progress cada 5 equipos
-      if (i % 5 === 0) {
-        document.getElementById('loading').innerHTML = `
-          <div class="spinner"></div>
-          <div>Procesando ${i+1}/${teams.length} equipos... (${allPlayers.length.toLocaleString()} jugadores)</div>
-        `;
-      }
     }
 
-    // Mostrar interfaz
     document.getElementById('loading').style.display = 'none';
     document.getElementById('controls').style.display = 'block';
     
@@ -70,7 +58,7 @@ async function loadData() {
     updateAll();
     
   } catch (error) {
-    document.getElementById('loading').innerHTML = '❌ Error al cargar datos. Revisa la consola.';
+    document.getElementById('loading').innerHTML = '❌ Error al cargar datos';
     console.error('Error:', error);
   }
 }
@@ -78,38 +66,32 @@ async function loadData() {
 // ---------------- FILTER CORE ----------------
 function filterPlayers() {
   return allPlayers.filter(p => {
-    // Nombre
     if (filters.name && !p.name.toLowerCase().includes(filters.name.toLowerCase())) return false;
-    
-    // Equipo
     if (filters.team !== "all" && p.team !== filters.team) return false;
-    
-    // Nacionalidad
     if (filters.nat !== "all" && p.nat !== filters.nat) return false;
     
-    // Edad
     if (p.age < filters.ageMin || p.age > filters.ageMax) return false;
-    
-    // ST
     if (p.st < filters.stMin || p.st > filters.stMax) return false;
-    
-    // TK
     if (p.tk < filters.tkMin || p.tk > filters.tkMax) return false;
+    if (p.ps < filters.psMin || p.ps > filters.psMax) return false;
+    if (p.sh < filters.shMin || p.sh > filters.shMax) return false;
     
-    // Posición
     if (filters.position !== "all" && !matchPosition(p, filters.position)) return false;
     
     return true;
   });
 }
 
-// ---------------- POSITIONS ----------------
+// ---------------- POSITIONS - CORREGIDO ----------------
 function matchPosition(p, pos) {
-  if (pos === "GK") return p.st <= 2;
-  if (pos === "DF") return p.tk >= 10;
-  if (pos === "MF") return p.ps >= 10;
-  if (pos === "FW") return p.sh >= 10;
-  return true;
+  console.log('Checking position:', pos, 'Player:', p); // DEBUG
+  switch(pos) {
+    case "GK": return p.st <= 3;  // Porteros tienen ST bajo
+    case "DF": return p.tk >= 12; // Defensas buenos en tackle
+    case "MF": return p.ps >= 12; // Medios buenos en pase
+    case "FW": return p.sh >= 12; // Delanteros buenos en tiro
+    default: return true;
+  }
 }
 
 // ---------------- BUILD FILTERS ----------------
@@ -120,55 +102,59 @@ function buildFilters() {
   const teams = [...new Set(allPlayers.map(p => p.team))].sort();
   const nats = [...new Set(allPlayers.map(p => p.nat))].sort();
 
-  teamSel.innerHTML = `<option value="all">Todos los equipos (${teams.length})</option>` +
-    teams.map(t => `<option value="${t}">${t}</option>`).join("");
-
-  natSel.innerHTML = `<option value="all">Todas las nacionalidades (${nats.length})</option>` +
-    nats.map(n => `<option value="${n}">${n}</option>`).join("");
+  teamSel.innerHTML = `<option value="all">Todos (${teams.length})</option>` + teams.map(t => `<option value="${t}">${t}</option>`).join("");
+  natSel.innerHTML = `<option value="all">Todos (${nats.length})</option>` + nats.map(n => `<option value="${n}">${n}</option>`).join("");
 
   // Event listeners
   teamSel.onchange = e => { filters.team = e.target.value; updateAll(); };
   natSel.onchange = e => { filters.nat = e.target.value; updateAll(); };
+  document.getElementById("nameSearch").oninput = e => { filters.name = e.target.value; updateAll(); };
 
-  document.getElementById("nameSearch").oninput = e => {
-    filters.name = e.target.value;
-    updateAll();
-  };
+  // TODOS los sliders
+  setupDualSlider('age', 16, 40);
+  setupDualSlider('st', 0, 20);
+  setupDualSlider('tk', 0, 20);
+  setupDualSlider('ps', 0, 20);
+  setupDualSlider('sh', 0, 20);
 
-  // Sliders
-  setupSlider('ageMin', 'ageMax', 16, 40, updateAll);
-  setupSlider('stMin', 'stMax', 0, 20, updateAll);
-  setupSlider('tkMin', 'tkMax', 0, 20, updateAll);
-
-  // Position buttons
+  // Position buttons - FIJADO
   document.querySelectorAll('.pos-btn').forEach(btn => {
-    btn.onclick = () => setPosition(btn.dataset.pos);
+    btn.addEventListener('click', () => {
+      console.log('Button clicked:', btn.dataset.pos); // DEBUG
+      setPosition(btn.dataset.pos);
+    });
   });
+
+  updatePositionButtons();
 }
 
-function setupSlider(minId, maxId, minVal, maxVal, callback) {
+function setupDualSlider(stat, minVal, maxVal) {
+  const minId = `${stat}Min`;
+  const maxId = `${stat}Max`;
   const minSlider = document.getElementById(minId);
   const maxSlider = document.getElementById(maxId);
   const minValSpan = document.getElementById(minId + 'Val');
   const maxValSpan = document.getElementById(maxId + 'Val');
 
-  minSlider.min = minVal; maxSlider.min = minVal;
-  minSlider.max = maxVal; maxSlider.max = maxVal;
-  minSlider.value = minVal; maxSlider.value = maxVal;
+  minSlider.min = maxSlider.min = minVal;
+  minSlider.max = maxSlider.max = maxVal;
+  minSlider.value = minVal;
+  maxSlider.value = maxVal;
 
-  const updateSlider = () => {
-    filters[minId] = +minSlider.value;
-    filters[maxId] = +maxSlider.value;
+  const update = () => {
+    filters[`${stat}Min`] = +minSlider.value;
+    filters[`${stat}Max`] = +maxSlider.value;
     minValSpan.textContent = minSlider.value;
     maxValSpan.textContent = maxSlider.value;
-    callback();
+    updateAll();
   };
 
-  minSlider.oninput = maxSlider.oninput = updateSlider;
+  minSlider.oninput = maxSlider.oninput = update;
 }
 
-// ---------------- UI ACTIONS ----------------
+// ---------------- POSITION BUTTONS - CORREGIDO ----------------
 function setPosition(pos) {
+  console.log('Setting position to:', pos); // DEBUG
   filters.position = pos;
   updatePositionButtons();
   updateAll();
@@ -176,27 +162,33 @@ function setPosition(pos) {
 
 function updatePositionButtons() {
   document.querySelectorAll('.pos-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.pos === filters.position);
+    if (btn.dataset.pos === filters.position) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
   });
 }
 
 function resetFilters() {
-  filters.name = "";
-  filters.team = "all";
-  filters.nat = "all";
-  filters.position = "all";
-  filters.ageMin = 16; filters.ageMax = 40;
-  filters.stMin = 0; filters.stMax = 20;
-  filters.tkMin = 0; filters.tkMax = 20;
+  Object.assign(filters, {
+    name: "", team: "all", nat: "all", position: "all",
+    ageMin: 16, ageMax: 40, stMin: 0, stMax: 20,
+    tkMin: 0, tkMax: 20, psMin: 0, psMax: 20, shMin: 0, shMax: 20
+  });
 
   // Reset UI
   document.getElementById("nameSearch").value = "";
   document.getElementById("teamFilter").value = "all";
   document.getElementById("natFilter").value = "all";
   
-  setupSlider('ageMin', 'ageMax', 16, 40, () => {});
-  setupSlider('stMin', 'stMax', 0, 20, () => {});
-  setupSlider('tkMin', 'tkMax', 0, 20, () => {});
+  // Reset sliders
+  ['age', 'st', 'tk', 'ps', 'sh'].forEach(stat => {
+    document.getElementById(`${stat}Min`).value = filters[`${stat}Min`];
+    document.getElementById(`${stat}Max`).value = filters[`${stat}Max`];
+    document.getElementById(`${stat}MinVal`).textContent = filters[`${stat}Min`];
+    document.getElementById(`${stat}MaxVal`).textContent = filters[`${stat}Max`];
+  });
 
   updatePositionButtons();
   updateAll();
@@ -208,50 +200,39 @@ function updateAll() {
   updateStats(filteredPlayers);
 }
 
-// ---------------- STATS ----------------
+// ---------------- STATS & RENDER ----------------
 function updateStats(players) {
-  document.getElementById('statsRow').style.display = 'flex';
-  document.getElementById('totalPlayers').textContent = players.length.toLocaleString();
-  
+  document.getElementById('statsRow').style.display = players.length > 0 ? 'flex' : 'none';
   if (players.length > 0) {
-    const avgAge = Math.round(players.reduce((sum, p) => sum + p.age, 0) / players.length);
-    const topStat = Math.max(...players.map(p => Math.max(p.st, p.tk, p.ps, p.sh)));
-    
+    document.getElementById('totalPlayers').textContent = players.length.toLocaleString();
+    const avgAge = Math.round(players.reduce((a, p) => a + p.age, 0) / players.length);
     document.getElementById('avgAge').textContent = avgAge;
-    document.getElementById('topStat').textContent = topStat;
+    const top = Math.max(...players.map(p => Math.max(p.st, p.tk, p.ps, p.sh)));
+    document.getElementById('topStat').textContent = top;
   }
 }
 
-// ---------------- RENDER ----------------
 function render(players) {
   const tbody = document.getElementById("results");
+  const table = document.getElementById('tableContainer');
   
   if (players.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="13" class="no-results">
-          <div style="font-size: 4rem;">🔍</div>
-          <div style="font-size: 1.3rem; margin: 20px 0;">No se encontraron jugadores</div>
-          <div style="color: #64748b;">Prueba ajustando los filtros</div>
-        </td>
-      </tr>
-    `;
-    document.getElementById('tableContainer').style.display = 'block';
+    tbody.innerHTML = '<tr><td colspan="13" class="no-results"><div style="font-size:3rem;">🔍</div><div style="font-size:1.2rem;margin:15px 0;">Sin resultados</div><div>Ajusta los filtros</div></td></tr>';
+    table.style.display = 'block';
     return;
   }
 
-  document.getElementById('tableContainer').style.display = 'block';
-  
+  table.style.display = 'block';
   tbody.innerHTML = players.slice(0, 500).map(p => `
     <tr>
-      <td class="name-cell">${p.name}</td>
+      <td class="name-cell" style="font-weight:600;">${p.name}</td>
       <td>${p.team}</td>
       <td>${p.age}</td>
       <td>${p.nat}</td>
-      <td style="color: ${p.st >= 15 ? '#10b981' : ''}">${p.st}</td>
-      <td style="color: ${p.tk >= 15 ? '#10b981' : ''}">${p.tk}</td>
-      <td>${p.ps}</td>
-      <td style="color: ${p.sh >= 15 ? '#10b981' : ''}">${p.sh}</td>
+      <td style="color:${p.st>=15?'#10b981':''}">${p.st}</td>
+      <td style="color:${p.tk>=15?'#10b981':''}">${p.tk}</td>
+      <td style="color:${p.ps>=15?'#10b981':''}">${p.ps}</td>
+      <td style="color:${p.sh>=15?'#10b981':''}">${p.sh}</td>
       <td>${p.ag}</td>
       <td>${p.kab}</td>
       <td>${p.tab}</td>
@@ -263,25 +244,20 @@ function render(players) {
 
 // ---------------- EXPORT ----------------
 function exportResults() {
-  if (filteredPlayers.length === 0) {
-    alert('No hay jugadores para exportar');
-    return;
-  }
-
+  if (filteredPlayers.length === 0) return alert('Sin jugadores para exportar');
+  
   const csv = [
-    ['Nombre', 'Equipo', 'Edad', 'NAT', 'ST', 'TK', 'PS', 'SH', 'AG', 'KAb', 'TAb', 'PAb', 'SAb'],
-    ...filteredPlayers.map(p => [
-      p.name, p.team, p.age, p.nat, p.st, p.tk, p.ps, p.sh, p.ag, p.kab, p.tab, p.pab, p.sab
-    ])
+    ['Nombre','Equipo','Edad','NAT','ST','TK','PS','SH','AG','KAb','TAb','PAb','SAb'],
+    ...filteredPlayers.map(p => [p.name,p.team,p.age,p.nat,p.st,p.tk,p.ps,p.sh,p.ag,p.kab,p.tab,p.pab,p.sab])
   ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `jugadores_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = `scouting_${Date.now()}.csv`;
   a.click();
-  window.URL.revokeObjectURL(url);
+  URL.revokeObjectURL(url);
 }
 
 // ---------------- INIT ----------------

@@ -371,46 +371,56 @@
       </div>
 
       <div class="filters-grid">
-        <div class="filter-group">
-          <label class="filter-label">📏 Edad</label>
-          <div class="range-group">
-            <div class="range-inputs">
-              <input type="range" id="ageMin" min="16" max="40" value="16">
-              <span class="range-value" id="ageMinVal">16</span>
-            </div>
-            <div class="range-inputs">
-              <input type="range" id="ageMax" min="16" max="40" value="40">
-              <span class="range-value" id="ageMaxVal">40</span>
-            </div>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">⭐ ST (Strength)</label>
-          <div class="range-group">
-            <div class="range-inputs">
-              <input type="range" id="stMin" min="0" max="20" value="0">
-              <span class="range-value" id="stMinVal">0</span>
-            </div>
-            <div class="range-inputs">
-              <input type="range" id="stMax" min="0" max="20" value="20">
-              <span class="range-value" id="stMaxVal">20</span>
-            </div>
-          </div>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">⚔️ TK (Tackle)</label>
-          <div class="range-group">
-            <div class="range-inputs">
-              <input type="range" id="tkMin" min="0" max="20" value="0">
-              <span class="range-value" id="tkMinVal">0</span>
-            </div>
-            <div class="range-inputs">
-              <input type="range" id="tkMax" min="0" max="20" value="20">
-              <span class="range-value" id="tkMaxVal">20</span>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="filter-group">
+    <label class="filter-label">📏 Edad</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="range" id="ageMin" min="16" max="40" value="16" style="flex: 1;">
+      <span class="range-value" id="ageMinVal">16</span>
+      <input type="range" id="ageMax" min="16" max="40" value="40" style="flex: 1;">
+      <span class="range-value" id="ageMaxVal">40</span>
+    </div>
+  </div>
+  
+  <div class="filter-group">
+    <label class="filter-label">⭐ ST</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="range" id="stMin" min="0" max="20" value="0" style="flex: 1;">
+      <span class="range-value" id="stMinVal">0</span>
+      <input type="range" id="stMax" min="0" max="20" value="20" style="flex: 1;">
+      <span class="range-value" id="stMaxVal">20</span>
+    </div>
+  </div>
+  
+  <div class="filter-group">
+    <label class="filter-label">⚔️ TK</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="range" id="tkMin" min="0" max="20" value="0" style="flex: 1;">
+      <span class="range-value" id="tkMinVal">0</span>
+      <input type="range" id="tkMax" min="0" max="20" value="20" style="flex: 1;">
+      <span class="range-value" id="tkMaxVal">20</span>
+    </div>
+  </div>
+  
+  <div class="filter-group">
+    <label class="filter-label">🎯 PS</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="range" id="psMin" min="0" max="20" value="0" style="flex: 1;">
+      <span class="range-value" id="psMinVal">0</span>
+      <input type="range" id="psMax" min="0" max="20" value="20" style="flex: 1;">
+      <span class="range-value" id="psMaxVal">20</span>
+    </div>
+  </div>
+  
+  <div class="filter-group">
+    <label class="filter-label">💥 SH</label>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="range" id="shMin" min="0" max="20" value="0" style="flex: 1;">
+      <span class="range-value" id="shMinVal">0</span>
+      <input type="range" id="shMax" min="0" max="20" value="20" style="flex: 1;">
+      <span class="range-value" id="shMaxVal">20</span>
+    </div>
+  </div>
+</div>
 
       <div class="position-grid">
         <button class="pos-btn active" data-pos="all">TODOS</button>
