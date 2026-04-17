@@ -188,7 +188,6 @@ btnEnviar.onclick = async () => {
 
     const data = await res.json()
     // 🔥 LOG RESPUESTA
-    const data = await res.json()
     console.log('📡 Respuesta API:', data)
     console.log('Status:', res.status, res.statusText
     if(res.ok) {
