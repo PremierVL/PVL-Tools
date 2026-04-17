@@ -96,31 +96,30 @@ crearEntrenamientos()
 // 🔄 loading
 loadingMsg.style.display = "block"
 
-// limpiar selects
+// seguridad
+const players = equipo.players || []
+
+// limpiar selects antes de rellenar
 for(let i=1;i<=5;i++){
 const sel = document.getElementById(`jugador_${i}`)
 if(sel) sel.innerHTML = `<option value="">-- Jugador --</option>`
 }
 
-// pequeña UX delay
+// UX pequeño delay
 await new Promise(r => setTimeout(r, 300))
 
-// ✔ cargar jugadores
+// ✔ rellenar jugadores
 for(let i=1;i<=5;i++){
 
 const jugadorSelect = document.getElementById(`jugador_${i}`)
 jugadorSelect.innerHTML = `<option value="">-- Jugador --</option>`
 
-if(equipo && equipo.players){
-
-equipo.players.forEach(p => {
+players.forEach(p => {
   const opt = document.createElement("option")
   opt.value = p
   opt.textContent = p
   jugadorSelect.appendChild(opt)
 })
-
-}
 
 }
 
