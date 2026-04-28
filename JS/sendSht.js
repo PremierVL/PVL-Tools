@@ -130,11 +130,11 @@ function validarCondicionales(lines){
       return
     }
 
-    // ✅ VALIDAR PARÁMETROS (antes de IF)
+    // ✅ PARÁMETROS (versión simple que funcionaba)
     if(["SUB","CHANGEPOS"].includes(order)){
       const params = tokens.slice(1, ifIndex)
       if(params.length !== 3){
-        errores.push(`❌ Línea ${index+1}: ${order} necesita 3 parámetros`)
+        errores.push(`❌ Línea ${index+1}: ${order} necesita 3 parámetros (entrada, salida, posición)`)
         return
       }
       
@@ -142,11 +142,11 @@ function validarCondicionales(lines){
       const salida = params[1]
       const posicion = params[2]
       
-      // Entrada: número (1-18) O posición
+      // ✅ Entrada: número O posición
       const entradaNum = parseInt(entrada)
       const entradaOk = (!isNaN(entradaNum) && entradaNum >= 1 && entradaNum <= 18) || validPos.includes(entrada)
       
-      // Salida: número (1-18)
+      // ✅ Salida: número
       const salidaNum = parseInt(salida)
       const salidaOk = !isNaN(salidaNum) && salidaNum >= 1 && salidaNum <= 18
       
@@ -156,75 +156,70 @@ function validarCondicionales(lines){
       }
     }
 
+    // ✅ TACTIC (versión simple)
     if(order === "TACTIC"){
       const tacticParam = tokens[1]
-      if(!validPos.includes(tacticParam) && tacticParam !== "A" && tacticParam !== "D"){
+      // Permitir A,D,C,N,L,P,T,E + posiciones
+      if(!["A","D","C","N","L","P","T","E"].includes(tacticParam) && !validPos.includes(tacticParam)){
         errores.push(`❌ Línea ${index+1}: Táctica inválida (${tacticParam})`)
         return
       }
     }
 
-    // ✅ VALIDAR CONDICIONES MÚLTIPLES (después de IF)
+    // ✅ PROCESAR CONDICIONES (soporte múltiple + negativos)
     const condTokens = tokens.slice(ifIndex + 1)
-    let condPos = 0
+    let i = 0
     
-    while(condPos < condTokens.length){
-      const condType = condTokens[condPos]
+    while(i < condTokens.length){
+      const condType = condTokens[i]
       
       if(!validConditions.includes(condType)){
         errores.push(`❌ Línea ${index+1}: Condición inválida (${condType})`)
         return
       }
 
-      // Condiciones numéricas: COND SIGN VALUE
       if(["MIN","SCORE","SHOTS"].includes(condType)){
-        if(condPos + 3 > condTokens.length){
+        if(i + 2 >= condTokens.length){
           errores.push(`❌ Línea ${index+1}: Falta signo/valor para ${condType}`)
           return
         }
         
-        const sign = condTokens[condPos + 1]
-        const value = condTokens[condPos + 2]
+        const sign = condTokens[i + 1]
+        const value = condTokens[i + 2]
         
         if(!validSigns.includes(sign)){
           errores.push(`❌ Línea ${index+1}: Signo inválido (${sign})`)
           return
         }
         
-        if(isNaN(parseInt(value)) || parseInt(value) < 0){
+        // ✅ PERMITE NEGATIVOS (SCORE = -2)
+        const valNum = parseInt(value)
+        if(isNaN(valNum)){
           errores.push(`❌ Línea ${index+1}: Valor inválido (${value})`)
           return
         }
         
-        condPos += 3  // Saltar COND + SIGN + VALUE
+        i += 3
       }
-      // Condiciones de jugador: COND TARGET
-      else if(["RED","YELLOW","INJURED"].includes(condType)){
-        if(condPos + 2 > condTokens.length){
+      else{ // RED, YELLOW, INJURED
+        if(i + 1 >= condTokens.length){
           errores.push(`❌ Línea ${index+1}: Falta target para ${condType}`)
           return
         }
         
-        const target = condTokens[condPos + 1]
+        const target = condTokens[i + 1]
         if(!validPos.includes(target) && isNaN(parseInt(target))){
           errores.push(`❌ Línea ${index+1}: Target inválido (${target})`)
           return
         }
         
-        condPos += 2  // Saltar COND + TARGET
-      }
-      else{
-        errores.push(`❌ Línea ${index+1}: Condición no implementada (${condType})`)
-        return
+        i += 2
       }
     }
-
-    // ✅ Todas las condiciones procesadas correctamente
   })
 
   return errores
 }
-
 /* =========================
    VALIDAR JUGADORES
 ========================= */
