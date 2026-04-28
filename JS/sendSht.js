@@ -213,7 +213,6 @@ function validarCondicionales(lines){
 
   return errores
 }
-
 /* =========================
    VALIDAR JUGADORES
 ========================= */
