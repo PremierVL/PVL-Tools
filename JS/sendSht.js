@@ -130,28 +130,46 @@ function validarCondicionales(lines){
       return
     }
 
-    // ✅ VALIDAR PARÁMETROS DE SUB/CHANGEPOS
+    // ✅ VALIDACIÓN MEJORADA PARA TU FORMATO
     if(["SUB","CHANGEPOS"].includes(order)){
-      if(tokens.length < 4){
-        errores.push(`❌ Línea ${index+1}: Falta posición (ej: SUB 2 12 DF)`)
+      if(tokens.length < ifIndex){
+        errores.push(`❌ Línea ${index+1}: Falta parámetros de ${order}`)
         return
       }
       
-      const entrada = parseInt(tokens[1])
-      const salida = parseInt(tokens[2])
-      const posicion = tokens[3]
+      const params = tokens.slice(1, ifIndex)
       
-      if(isNaN(entrada) || entrada < 1 || entrada > 18){
-        errores.push(`❌ Línea ${index+1}: Número entrada inválido (${tokens[1]})`)
+      if(params.length !== 3){
+        errores.push(`❌ Línea ${index+1}: ${order} necesita 3 parámetros (entrada, salida, posición)`)
         return
       }
       
-      if(isNaN(salida) || salida < 1 || salida > 18){
-        errores.push(`❌ Línea ${index+1}: Número salida inválido (${tokens[2]})`)
+      const entrada = params[0]
+      const salida = params[1]
+      const posicion = params[2]
+      
+      // ✅ ENTRADA: número (1-18) O posición válida
+      const entradaNum = parseInt(entrada)
+      const entradaOk = (!isNaN(entradaNum) && entradaNum >= 1 && entradaNum <= 18) || validPos.includes(entrada)
+      
+      // ✅ SALIDA: SIEMPRE número (1-18)
+      const salidaNum = parseInt(salida)
+      const salidaOk = !isNaN(salidaNum) && salidaNum >= 1 && salidaNum <= 18
+      
+      // ✅ POSICIÓN: siempre posición válida
+      const posicionOk = validPos.includes(posicion)
+      
+      if(!entradaOk){
+        errores.push(`❌ Línea ${index+1}: Entrada inválida (${entrada})`)
         return
       }
       
-      if(!validPos.includes(posicion)){
+      if(!salidaOk){
+        errores.push(`❌ Línea ${index+1}: Salida inválida (${salida})`)
+        return
+      }
+      
+      if(!posicionOk){
         errores.push(`❌ Línea ${index+1}: Posición inválida (${posicion})`)
         return
       }
@@ -163,7 +181,6 @@ function validarCondicionales(lines){
       return
     }
 
-    // ✅ VALIDAR CONDICIONES NUMÉRICAS (MIN, SCORE, SHOTS)
     if(["MIN","SCORE","SHOTS"].includes(condType)){
       const sign = tokens[ifIndex+2]
       const value = tokens[ifIndex+3]
@@ -179,7 +196,6 @@ function validarCondicionales(lines){
       }
     }
 
-    // ✅ VALIDAR CONDICIONES DE JUGADOR (RED, YELLOW, INJURED)
     if(["RED","YELLOW","INJURED"].includes(condType)){
       const target = tokens[ifIndex+2]
 
@@ -197,6 +213,7 @@ function validarCondicionales(lines){
 
   return errores
 }
+
 /* =========================
    VALIDAR JUGADORES
 ========================= */
