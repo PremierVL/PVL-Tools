@@ -130,43 +130,53 @@ function validarCondicionales(lines){
       return
     }
 
-    // ✅ PARÁMETROS (versión simple que funcionaba)
-    if(["SUB","CHANGEPOS"].includes(order)){
+    // ✅ VALIDAR PARÁMETROS ESPECÍFICOS POR ORDEN
+    if(order === "SUB"){
       const params = tokens.slice(1, ifIndex)
       if(params.length !== 3){
-        errores.push(`❌ Línea ${index+1}: ${order} necesita 3 parámetros (entrada, salida, posición)`)
+        errores.push(`❌ Línea ${index+1}: SUB necesita 3 parámetros (entrada, salida, posición)`)
         return
       }
-      
       const entrada = params[0]
       const salida = params[1]
       const posicion = params[2]
       
-      // ✅ Entrada: número O posición
       const entradaNum = parseInt(entrada)
       const entradaOk = (!isNaN(entradaNum) && entradaNum >= 1 && entradaNum <= 18) || validPos.includes(entrada)
-      
-      // ✅ Salida: número
       const salidaNum = parseInt(salida)
       const salidaOk = !isNaN(salidaNum) && salidaNum >= 1 && salidaNum <= 18
       
       if(!entradaOk || !salidaOk || !validPos.includes(posicion)){
-        errores.push(`❌ Línea ${index+1}: Parámetros inválidos (${entrada} ${salida} ${posicion})`)
+        errores.push(`❌ Línea ${index+1}: Parámetros SUB inválidos`)
         return
       }
     }
-
-    // ✅ TACTIC (versión simple)
-    if(order === "TACTIC"){
+    
+    else if(order === "CHANGEPOS"){
+      const params = tokens.slice(1, ifIndex)
+      if(params.length !== 2){
+        errores.push(`❌ Línea ${index+1}: CHANGEPOS necesita 2 parámetros (num_pos, nueva_pos)`)
+        return
+      }
+      const numPos = params[0]
+      const nuevaPos = params[1]
+      
+      const numPosOk = !isNaN(parseInt(numPos)) && parseInt(numPos) >= 1 && parseInt(numPos) <= 18
+      if(!numPosOk || !validPos.includes(nuevaPos)){
+        errores.push(`❌ Línea ${index+1}: CHANGEPOS inválido (${numPos} ${nuevaPos})`)
+        return
+      }
+    }
+    
+    else if(order === "TACTIC"){
       const tacticParam = tokens[1]
-      // Permitir A,D,C,N,L,P,T,E + posiciones
       if(!["A","D","C","N","L","P","T","E"].includes(tacticParam) && !validPos.includes(tacticParam)){
         errores.push(`❌ Línea ${index+1}: Táctica inválida (${tacticParam})`)
         return
       }
     }
 
-    // ✅ PROCESAR CONDICIONES (soporte múltiple + negativos)
+    // ✅ VALIDAR CONDICIONES MÚLTIPLES (con soporte negativos)
     const condTokens = tokens.slice(ifIndex + 1)
     let i = 0
     
@@ -183,7 +193,6 @@ function validarCondicionales(lines){
           errores.push(`❌ Línea ${index+1}: Falta signo/valor para ${condType}`)
           return
         }
-        
         const sign = condTokens[i + 1]
         const value = condTokens[i + 2]
         
@@ -192,7 +201,6 @@ function validarCondicionales(lines){
           return
         }
         
-        // ✅ PERMITE NEGATIVOS (SCORE = -2)
         const valNum = parseInt(value)
         if(isNaN(valNum)){
           errores.push(`❌ Línea ${index+1}: Valor inválido (${value})`)
@@ -201,18 +209,16 @@ function validarCondicionales(lines){
         
         i += 3
       }
-      else{ // RED, YELLOW, INJURED
+      else{ // RED,YELLOW,INJURED
         if(i + 1 >= condTokens.length){
           errores.push(`❌ Línea ${index+1}: Falta target para ${condType}`)
           return
         }
-        
         const target = condTokens[i + 1]
         if(!validPos.includes(target) && isNaN(parseInt(target))){
           errores.push(`❌ Línea ${index+1}: Target inválido (${target})`)
           return
         }
-        
         i += 2
       }
     }
