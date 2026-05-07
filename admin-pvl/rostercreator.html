@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Plantilla a FM</title>
+    <title>Conversor de Plantilla a FM - V2</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
@@ -81,29 +81,33 @@
             color: #00ff88;
             margin-bottom: 20px;
         }
+        .debug {
+            font-size: 10px;
+            color: #888;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>🔄 Conversor de Plantilla a Formato FM</h1>
+        <h1>🔄 Conversor de Plantilla a Formato FM - V2</h1>
     </div>
     
     <div class="container">
         <div class="panel">
             <h2>📋 Instrucciones</h2>
             <ol>
-                <li>Pega el contenido de tu plantilla en el textarea de la derecha</li>
+                <li>Pega el contenido de tu plantilla en el textarea</li>
                 <li>Ajusta el <strong>margen de corrección</strong> (por defecto: 3)</li>
                 <li>Presiona <strong>"Convertir a FM"</strong></li>
                 <li>Copia el resultado del panel inferior</li>
-                <li>¡Listo para pegar en Football Manager!</li>
             </ol>
             <div style="margin-top: 20px; font-size: 12px; color: #888;">
-                <strong>Formato detectado:</strong><br>
-                - Porteros → PO<br>
-                - Defensas → DF<br>
-                - Medios → MF<br>
-                - Delanteros → FW
+                <strong>✅ Parser mejorado:</strong><br>
+                - Detecta números de dorsal<br>
+                - Une líneas de nombre/nacionalidad<br>
+                - Extrae rating del final<br>
+                - Maneja espacios múltiples
             </div>
         </div>
         
@@ -111,11 +115,12 @@
             <h2>📝 Pegar Plantilla</h2>
             <textarea id="inputText" placeholder="Pega aquí el contenido de tu plantilla..."></textarea>
             <div class="controls">
-                <label>Margen de corrección: </label>
+                <label>Margen: </label>
                 <input type="number" id="margin" value="3" min="0" max="20">
                 <button onclick="convertToFM()">🔄 Convertir a FM</button>
                 <button onclick="clearAll()">🗑️ Limpiar</button>
             </div>
+            <div class="debug" id="debug"></div>
         </div>
     </div>
     
@@ -125,35 +130,98 @@
     </div>
 
     <script>
+		const iso2to3 = {
+		  AF: "AFG", AL: "ALB", DZ: "DZA", AD: "AND", AO: "AGO", AG: "ATG", AR: "ARG", AM: "ARM",
+		  AU: "AUS", AT: "AUT", AZ: "AZE",
+		  BS: "BHS", BH: "BHR", BD: "BGD", BB: "BRB", BY: "BLR", BE: "BEL", BZ: "BLZ", BJ: "BEN",
+		  BT: "BTN", BO: "BOL", BA: "BIH", BW: "BWA", BR: "BRA", BN: "BRN", BG: "BGR", BF: "BFA",
+		  BI: "BDI",
+		  CV: "CPV", KH: "KHM", CM: "CMR", CA: "CAN", CF: "CAF", TD: "TCD", CL: "CHL", CN: "CHN",
+		  CO: "COL", KM: "COM", CD: "COD", CG: "COG", CR: "CRI", CI: "CIV", HR: "HRV", CU: "CUB",
+		  CY: "CYP", CZ: "CZE",
+		  DK: "DNK", DJ: "DJI", DM: "DMA", DO: "DOM",
+		  EC: "ECU", EG: "EGY", SV: "SLV", GQ: "GNQ", ER: "ERI", EE: "EST", SZ: "SWZ", ET: "ETH",
+		  FJ: "FJI", FI: "FIN", FR: "FRA",
+		  GA: "GAB", GM: "GMB", GE: "GEO", DE: "DEU", GH: "GHA", GR: "GRC", GD: "GRD", GT: "GTM",
+		  GN: "GIN", GW: "GNB", GY: "GUY",
+		  HT: "HTI", HN: "HND", HU: "HUN",
+		  IS: "ISL", IN: "IND", ID: "IDN", IR: "IRN", IQ: "IRQ", IE: "IRL", IL: "ISR", IT: "ITA",
+		  JM: "JAM", JP: "JPN", JO: "JOR",
+		  KZ: "KAZ", KE: "KEN", KI: "KIR", KP: "PRK", KR: "KOR", KW: "KWT", KG: "KGZ",
+		  LA: "LAO", LV: "LVA", LB: "LBN", LS: "LSO", LR: "LBR", LY: "LBY", LI: "LIE", LT: "LTU",
+		  LU: "LUX",
+		  MG: "MDG", MW: "MWI", MY: "MYS", MV: "MDV", ML: "MLI", MT: "MLT", MH: "MHL", MR: "MRT",
+		  MU: "MUS", MX: "MEX", FM: "FSM", MD: "MDA", MC: "MCO", MN: "MNG", ME: "MNE", MA: "MAR",
+		  MZ: "MOZ", MM: "MMR",
+		  NA: "NAM", NR: "NRU", NP: "NPL", NL: "NLD", NZ: "NZL", NI: "NIC", NE: "NER", NG: "NGA",
+		  MK: "MKD", NO: "NOR",
+		  OM: "OMN",
+		  PK: "PAK", PW: "PLW", PA: "PAN", PG: "PNG", PY: "PRY", PE: "PER", PH: "PHL", PL: "POL",
+		  PT: "PRT",
+		  QA: "QAT",
+		  RO: "ROU", RU: "RUS", RW: "RWA",
+		  KN: "KNA", LC: "LCA", VC: "VCT", WS: "WSM", SM: "SMR", ST: "STP", SA: "SAU", SN: "SEN",
+		  RS: "SRB", SC: "SYC", SL: "SLE", SG: "SGP", SK: "SVK", SI: "SVN", SB: "SLB", SO: "SOM",
+		  ZA: "ZAF", SS: "SSD", ES: "ESP", LK: "LKA",
+		  SD: "SDN", SR: "SUR", SE: "SWE", CH: "CHE", SY: "SYR",
+		  TW: "TWN", TJ: "TJK", TZ: "TZA", TH: "THA", TL: "TLS", TG: "TGO", TO: "TON",
+		  TT: "TTO", TN: "TUN", TR: "TUR", TM: "TKM", TV: "TUV",
+		  UG: "UGA", UA: "UKR", AE: "ARE", GB: "GBR", US: "USA", UY: "URY", UZ: "UZB",
+		  VU: "VUT", VA: "VAT", VE: "VEN", VN: "VNM",
+		  YE: "YEM",
+		  ZM: "ZMB", ZW: "ZWE"
+		};
+
+		function convertISO2toISO3(code) {
+			return iso2to3[code?.toUpperCase()] || code;
+		}
+
         function convertToFM() {
             const inputText = document.getElementById('inputText').value;
             const margin = parseInt(document.getElementById('margin').value) || 3;
             const output = document.getElementById('output');
+            const debug = document.getElementById('debug');
             
-            const lines = inputText.split('\n').map(line => line.trim()).filter(line => line);
+            const lines = inputText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
             const players = [];
             let currentPosition = '';
             
-            // Detectar posiciones y jugadores
-            for (let line of lines) {
+            //debug.textContent = `📊 Líneas procesadas: ${lines.length}\n`;
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+				lines[i] = lines[i].replace(/\t/g, "|");
+
+				const tabulaciones = lines[i].match(/\|/g);
+				const cantidad = tabulaciones ? tabulaciones.length : 0;
+
+				if (cantidad > 1 ) {console.log(lines[i])};
                 // Detectar posición
                 if (line.includes('Goalkeepers')) {
                     currentPosition = 'PO';
+                    //debug.textContent += `⚽ Posición: ${currentPosition}\n`;
                 } else if (line.includes('Defenders')) {
                     currentPosition = 'DF';
+                    //debug.textContent += `🛡️ Posición: ${currentPosition}\n`;
                 } else if (line.includes('Midfielders')) {
                     currentPosition = 'MF';
+                    //debug.textContent += `⚙️ Posición: ${currentPosition}\n`;
                 } else if (line.includes('Strikers')) {
                     currentPosition = 'FW';
+                    //debug.textContent += `🔥 Posición: ${currentPosition}\n`;
                 }
-                // Detectar jugadores (líneas con número al inicio)
-                else if (/^\d+\s/.test(line) && !line.match(/^(Age|cm|€|Rating)/)) {
-                    const playerData = parsePlayerLine(line, currentPosition);
-                    if (playerData) {
-                        players.push(playerData);
+                // Detectar dorsal (número al inicio)
+                else if (cantidad > 1 ) {
+                    const player = parsePlayerBlock(lines, i, currentPosition);
+                    if (player) {
+                        players.push(player);
+                        i += player.lineCount - 1; // Saltar líneas del jugador
+                        //debug.textContent += `✅ Jugador: ${player.name} (${player.position} ${player.rating})\n`;
                     }
                 }
             }
+            
+            //debug.textContent += `\n🎯 Total jugadores encontrados: ${players.length}`;
             
             // Generar output
             let result = "Name         Age Nat St Tk Ps Sh Ag KAb TAb PAb SAb Gam Sub  Min Mom Sav Con Ktk Kps Sht Gls Ass  DP Inj Sus Fit\n";
@@ -162,18 +230,41 @@
             players.forEach(player => {
                 const ratingTens = Math.floor(player.rating / 10);
                 const ratingUnits = player.rating % 10;
-                const correctedRating = ratingTens + margin;
-                
+                const correctedRating = Math.min(99, ratingTens + margin); // Máximo 99
+                let St = 1;
+				let Tk = 1;
+				let Ps = 1;
+				let Sh = 1;
+				let Ag = 20;
+                let KAb = 100;
+				let TAb = 300;
+				let PAb = 300;
+				let SAb = 300;
                 let kabValue;
                 if (player.position === 'PO') {
-                    kabValue = ratingUnits * 100;
-                } else {
-                    kabValue = 300;
-                }
-                
-                const playerLine = `${player.name.padEnd(13)} ${player.age.padEnd(3)} ${player.nat.padEnd(3)} ` +
-                                 `${player.position.padEnd(2)} DF MF FW 20 100 ${correctedRating.toString().padStart(3)} ` +
-                                 `${correctedRating.toString().padStart(3)} ${correctedRating.toString().padStart(3)}   0   0    0   0   0   0   0   0   0   0   0   0   0 100\n`;
+                    KAb = ratingUnits * 100;
+					if (KAb == 0) {KAb=50;}
+					St = ratingTens+margin;
+                } 
+                if (player.position === 'DF') {
+                    TAb = ratingUnits * 100;
+					if (TAb == 0) {TAb=50;}
+					Tk = ratingTens+margin;
+                } 
+				if (player.position === 'MF') {
+                    PAb = ratingUnits * 100;
+					if (PAb == 0) {PAb=50;}
+					Ps = ratingTens+margin;
+                } 
+				if (player.position === 'FW') {
+                    SAb = ratingUnits * 100;
+					if (SAb == 0) {SAb=50;}
+					Sh = ratingTens+margin;
+                } 
+                const playerLine = `${player.name.padEnd(13)} ${player.age} ${player.nat3.padStart(3).toLowerCase()} ` +
+                                 `${String(St).padStart(2)} ${String(Tk).padStart(2)} ${String(Ps).padStart(2)} ${String(Sh).padStart(2)} ${Ag} ${String(KAb).padStart(3)} ${String(TAb).padStart(3)} ${String(PAb).padStart(3)} ${String(SAb).padStart(3)}` +
+								 `   0   0    0   0   0   0   0   0   0   0   0   0   0   0 100\n`;
+                                 //`${correctedRating.toString().padStart(3)} ${correctedRating.toString().padStart(3)}   0   0    0   0   0   0   0   0   0   0   0   0 100\n`;
                 
                 result += playerLine;
             });
@@ -181,40 +272,78 @@
             output.textContent = result;
         }
         
-        function parsePlayerLine(line, position) {
-            // Extraer nombre (después del número inicial)
-            const nameMatch = line.match(/^\d+\s+(.+?)(?:\s+es|\s+\d|$)/);
-            if (!nameMatch) return null;
-            
-            const name = nameMatch[1].trim();
-            
-            // Extraer nacionalidad (después del segundo nombre)
-            const natMatch = line.match(/\s+(es|jp|ec|ma|mx)\b/);
-            const nat = natMatch ? natMatch[1].toUpperCase() : 'ES';
-            
-            // Extraer edad
-            const ageMatch = line.match(/\b(\d{2})\b/);
-            const age = ageMatch ? ageMatch[1] : '--';
-            
-            // Extraer rating (último número)
-            const ratingMatch = line.match(/\b(\d{2})\b(?=\s*$)/);
-            const rating = ratingMatch ? parseInt(ratingMatch[1]) : 0;
-            
-            return {
-                name: name.substring(0, 13), // Limitar a 13 caracteres
-                age: age,
-                nat: nat,
-                position: position,
-                rating: rating
-            };
+function parseNombre(nombre) {
+    let clean = nombre
+        .trimEnd()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/ñ/g, "n")
+        .replace(/Ñ/g, "N")
+        .replace(/\. /g, "_")
+        .replace(/ /g, "_");
+	console.log(nombre + " => " +clean);
+    // 🔥 si ya cabe, NO TOCAR
+    if (clean.length <= 13) {
+        return clean;
+    }
+
+    const parts = clean.split("_");
+
+    if (parts.length > 1) {
+        const first = parts[0];
+        const rest = parts.slice(1).join("_");
+
+        // caso inicial tipo A_X → quitar inicial
+        if (first.length === 1) {
+            clean = rest;
         }
+        // caso nombre largo → inicial + apellido
+        else {
+            clean = first[0] + "_" + rest;
+        }
+    }
+
+    // seguridad final
+    return clean.substring(0, 13);
+}
+
+        function parsePlayerBlock(lines, startIndex, position) {
+			const line = lines[startIndex];
+
+			// Separar por |
+			const parts = line.split("|").map(p => p.trim());
+
+			/*
+				parts[0] = nombre
+				parts[1] = nacionalidad
+				parts[2] = edad
+				parts[3] = altura
+				parts[4] = valor
+				parts[5] = rating
+			*/
+
+			const name = parseNombre(parts[0] || "");
+			const nat = parts[1]?.toUpperCase() || "ES";
+			const nat3 = convertISO2toISO3(nat);
+			const age = parts[2] || "00";
+			const rating = parseInt(parts[5]) || 50;
+
+			return {
+				name,
+				age,
+				nat3,
+				position,
+				rating,
+				lineCount: 1
+			};
+		}
         
         function clearAll() {
             document.getElementById('inputText').value = '';
             document.getElementById('output').textContent = 'Pega tu plantilla y presiona "Convertir a FM"...';
+            document.getElementById('debug').textContent = '';
         }
         
-        // Permitir convertir con Enter
         document.getElementById('inputText').addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 convertToFM();
