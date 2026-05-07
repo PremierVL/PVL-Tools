@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Plantilla a FM</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            height: 80vh;
+        }
+        .panel {
+            flex: 1;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #2a2a2a;
+        }
+        .panel h2 {
+            margin-top: 0;
+            color: #00ff88;
+        }
+        textarea {
+            width: 100%;
+            height: 70%;
+            background-color: #000;
+            color: #00ff88;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #00cc66;
+        }
+        #output {
+            background-color: #000;
+            color: #00ff88;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 11px;
+            white-space: pre;
+            overflow-y: auto;
+            height: 70%;
+            border: 1px solid #444;
+        }
+        .header {
+            text-align: center;
+            color: #00ff88;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔄 Conversor de Plantilla a Formato FM</h1>
+    </div>
+    
+    <div class="container">
+        <div class="panel">
+            <h2>📋 Instrucciones</h2>
+            <ol>
+                <li>Pega el contenido de tu plantilla en el textarea de la derecha</li>
+                <li>Ajusta el <strong>margen de corrección</strong> (por defecto: 3)</li>
+                <li>Presiona <strong>"Convertir a FM"</strong></li>
+                <li>Copia el resultado del panel inferior</li>
+                <li>¡Listo para pegar en Football Manager!</li>
+            </ol>
+            <div style="margin-top: 20px; font-size: 12px; color: #888;">
+                <strong>Formato detectado:</strong><br>
+                - Porteros → PO<br>
+                - Defensas → DF<br>
+                - Medios → MF<br>
+                - Delanteros → FW
+            </div>
+        </div>
+        
+        <div class="panel" style="flex: 2;">
+            <h2>📝 Pegar Plantilla</h2>
+            <textarea id="inputText" placeholder="Pega aquí el contenido de tu plantilla..."></textarea>
+            <div class="controls">
+                <label>Margen de corrección: </label>
+                <input type="number" id="margin" value="3" min="0" max="20">
+                <button onclick="convertToFM()">🔄 Convertir a FM</button>
+                <button onclick="clearAll()">🗑️ Limpiar</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel" style="margin-top: 20px;">
+        <h2>📤 Resultado FM</h2>
+        <div id="output">Pega tu plantilla y presiona "Convertir a FM"...</div>
+    </div>
+
+    <script>
+        function convertToFM() {
+            const inputText = document.getElementById('inputText').value;
+            const margin = parseInt(document.getElementById('margin').value) || 3;
+            const output = document.getElementById('output');
+            
+            const lines = inputText.split('\n').map(line => line.trim()).filter(line => line);
+            const players = [];
+            let currentPosition = '';
+            
+            // Detectar posiciones y jugadores
+            for (let line of lines) {
+                // Detectar posición
+                if (line.includes('Goalkeepers')) {
+                    currentPosition = 'PO';
+                } else if (line.includes('Defenders')) {
+                    currentPosition = 'DF';
+                } else if (line.includes('Midfielders')) {
+                    currentPosition = 'MF';
+                } else if (line.includes('Strikers')) {
+                    currentPosition = 'FW';
+                }
+                // Detectar jugadores (líneas con número al inicio)
+                else if (/^\d+\s/.test(line) && !line.match(/^(Age|cm|€|Rating)/)) {
+                    const playerData = parsePlayerLine(line, currentPosition);
+                    if (playerData) {
+                        players.push(playerData);
+                    }
+                }
+            }
+            
+            // Generar output
+            let result = "Name         Age Nat St Tk Ps Sh Ag KAb TAb PAb SAb Gam Sub  Min Mom Sav Con Ktk Kps Sht Gls Ass  DP Inj Sus Fit\n";
+            result += "----------------------------------------------------------------------------------------------------------------\n";
+            
+            players.forEach(player => {
+                const ratingTens = Math.floor(player.rating / 10);
+                const ratingUnits = player.rating % 10;
+                const correctedRating = ratingTens + margin;
+                
+                let kabValue;
+                if (player.position === 'PO') {
+                    kabValue = ratingUnits * 100;
+                } else {
+                    kabValue = 300;
+                }
+                
+                const playerLine = `${player.name.padEnd(13)} ${player.age.padEnd(3)} ${player.nat.padEnd(3)} ` +
+                                 `${player.position.padEnd(2)} DF MF FW 20 100 ${correctedRating.toString().padStart(3)} ` +
+                                 `${correctedRating.toString().padStart(3)} ${correctedRating.toString().padStart(3)}   0   0    0   0   0   0   0   0   0   0   0   0   0 100\n`;
+                
+                result += playerLine;
+            });
+            
+            output.textContent = result;
+        }
+        
+        function parsePlayerLine(line, position) {
+            // Extraer nombre (después del número inicial)
+            const nameMatch = line.match(/^\d+\s+(.+?)(?:\s+es|\s+\d|$)/);
+            if (!nameMatch) return null;
+            
+            const name = nameMatch[1].trim();
+            
+            // Extraer nacionalidad (después del segundo nombre)
+            const natMatch = line.match(/\s+(es|jp|ec|ma|mx)\b/);
+            const nat = natMatch ? natMatch[1].toUpperCase() : 'ES';
+            
+            // Extraer edad
+            const ageMatch = line.match(/\b(\d{2})\b/);
+            const age = ageMatch ? ageMatch[1] : '--';
+            
+            // Extraer rating (último número)
+            const ratingMatch = line.match(/\b(\d{2})\b(?=\s*$)/);
+            const rating = ratingMatch ? parseInt(ratingMatch[1]) : 0;
+            
+            return {
+                name: name.substring(0, 13), // Limitar a 13 caracteres
+                age: age,
+                nat: nat,
+                position: position,
+                rating: rating
+            };
+        }
+        
+        function clearAll() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('output').textContent = 'Pega tu plantilla y presiona "Convertir a FM"...';
+        }
+        
+        // Permitir convertir con Enter
+        document.getElementById('inputText').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                convertToFM();
+            }
+        });
+    </script>
+</body>
+</html>
