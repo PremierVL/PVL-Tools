@@ -1,0 +1,147 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+h1 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.squad-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* FILA DE POSICIÓN */
+.position-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* TÍTULO DE POSICIÓN */
+.position-title {
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.position-title.por { background: #FF6B35; }
+.position-title.def { background: #4ECDC4; }
+.position-title.med { background: #45B7D1; }
+.position-title.del { background: #96CEB4; }
+
+/* TARJETA DE JUGADOR */
+.player-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    width: 140px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.player-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+/* NÚMERO */
+.player-number {
+    background: #EF3340;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+}
+
+/* NOMBRE */
+.player-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+/* BANDERA */
+.player-flag {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+/* ESTADÍSTICAS */
+.player-stats {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.player-ability {
+    font-weight: 700;
+    color: #EF3340;
+    font-size: 1rem;
+}
+
+.player-info {
+    font-size: 0.7rem;
+    color: #888;
+}
+
+/* LOADING Y ERROR */
+.loading, .error {
+    text-align: center;
+    color: #fff;
+    font-size: 1.5rem;
+    padding: 50px;
+}
+
+.error {
+    color: #ff6b6b;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .player-card {
+        width: 120px;
+        padding: 10px;
+    }
+    
+    .player-name {
+        font-size: 0.8rem;
+    }
+}
