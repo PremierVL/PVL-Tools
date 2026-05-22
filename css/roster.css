@@ -242,20 +242,176 @@ h1 {
     }
 }
 
-.fixed-w-scroll {
-  position: fixed;
-  left: 0;
-  z-index: 99;
-  width: 100%;
-  transition: all .15s linear;
+/* =====================================================
+   CABECERA FIJA ESTILO BESOCCER
+===================================================== */
+
+.head-info {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 100px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #a00447 0%, #c7003b 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
+/* CONTENEDOR IZQUIERDO (ESCUDO + TÍTULO) */
+.head-info .left-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
-.head-info {
-  background: #3B811F;
-    background-color: rgb(59, 129, 31);
-  color: #fff;
-  border-bottom: 2px solid #e1e1e1;
+
+/* ESCUDO DEL EQUIPO */
+.head-info .team-crest {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.head-info .team-crest img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+/* TÍTULO "PLANTILLA" */
+.head-info .team-title {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* CONTENEDOR DERECHO (BOTONES) */
+.head-info .right-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* SELECTORES */
+.head-info .head-select {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.head-info .head-select label {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.head-info select {
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.95);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.head-info select:focus {
+    outline: none;
+    border-color: #fff;
+}
+
+/* BOTÓN COPIAR */
+.head-info .btn-copy {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 15px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.head-info .btn-copy:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-1px);
+}
+
+.head-info .btn-copy:active {
+    transform: translateY(0);
+}
+
+/* ICONO COPIAR */
+.head-info .btn-copy svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* MENSAJE COPIADO */
+.head-info .copy-success {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #28a745;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 1000;
+    animation: fadeInOut 2s forwards;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -40%); }
+    15% { opacity: 1; transform: translate(-50%, -50%); }
+    85% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -60%); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .head-info {
+        min-height: 80px;
+        padding: 10px 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .head-info .team-crest {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .head-info .team-crest img {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .head-info .team-title {
+        font-size: 1.2rem;
+    }
+    
+    .head-info .head-select {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
