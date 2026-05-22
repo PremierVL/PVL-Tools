@@ -84,7 +84,8 @@ function parseSquadData(text) {
                 tab: parseInt(parts[9]),
                 gam: gam,
                 gls: parseInt(parts[20]),
-                ass: parseInt(parts[21])
+                ass: parseInt(parts[21]),
+		ktk: parseInt(parts[17])
             });
         }
     }
