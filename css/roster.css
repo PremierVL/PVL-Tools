@@ -242,6 +242,22 @@ h1 {
     }
 }
 
+.fixed-w-scroll {
+  position: fixed;
+  left: 0;
+  z-index: 99;
+  width: 100%;
+  transition: all .15s linear;
+}
+
+}
+.head-info {
+  background: #3B811F;
+    background-color: rgb(59, 129, 31);
+  color: #fff;
+  border-bottom: 2px solid #e1e1e1;
+}
+
 @media (max-width: 480px) {
     /* En móvil muy pequeño, ocultar más columnas */
     .row-body td:nth-child(5),
