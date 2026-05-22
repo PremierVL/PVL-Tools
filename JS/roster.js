@@ -106,6 +106,10 @@ function createPlayerRow(p) {
             <td class="flag-cell">
                 <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
             </td>
+            <td data-stat="pj" class="green">${p.st}</td>
+            <td data-stat="pj" class="green">${p.tk}</td>
+            <td data-stat="pj" class="green">${p.ps}</td>
+            <td data-stat="pj" class="green">${p.sh}</td>
             <td data-stat="pj" class="green">${p.gam}</td>
             <td data-stat="pt">${Math.min(p.gam, Math.floor(p.gam * 0.7))}</td>
             <td data-stat="goles">${p.gls}</td>
@@ -125,6 +129,10 @@ function createSectionHeader(position) {
         <tr class="row-head">
             <th colspan="2" class="main">${getPositionName(position)}</th>
             <th></th>
+	    <th>St</th>
+	    <th>Tk</th>
+	    <th>Ps</th>
+	    <th>Sh</th>
             <th>PJ</th>
             <th>PT</th>
             <th>
