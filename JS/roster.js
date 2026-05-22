@@ -109,6 +109,7 @@ function createPlayerRow(p) {
             </td>
             <td class="flag-cell">
                 <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
+		${p.nat}
             </td>
 	    <td data-stat="edad" class="age-cell">${p.age}</td>
             <td data-stat="pj">${p.st}</td>
