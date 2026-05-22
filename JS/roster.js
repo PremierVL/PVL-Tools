@@ -1,5 +1,5 @@
 // =====================================================
-// PLANTILLA.JS - LFP Virtual
+// PLANTILLA.JS - LFP Virtual (Estilo Besoccer)
 // =====================================================
 
 // CÓDIGOS DE PAÍS A BANDERAS
@@ -20,9 +20,17 @@ const countryFlags = {
     'nz': '🇳🇿', 'din': '🇩🇰', 'hol': '🇳🇱', 'mac': '🇲🇰', 'ale': '🇩🇪'
 };
 
-// Obtener bandera por código
 function getFlag(code) {
     return countryFlags[code.toLowerCase()] || '🌍';
+}
+
+// Obtener inicial del nombre para imagen
+function getInitials(name) {
+    const parts = name.replace(/_/g, ' ').split(' ');
+    if (parts.length >= 2) {
+        return parts[0][0] + parts[1][0];
+    }
+    return parts[0].substring(0, 2);
 }
 
 // Determinar posición según estadísticas
@@ -35,6 +43,17 @@ function getPositionByStats(st, tk, ps, sh) {
     if (sh > 0 && sh === max) return 'del';
     
     return 'del';
+}
+
+// Obtener nombre de posición
+function getPositionName(pos) {
+    const names = {
+        'por': 'Porteros',
+        'def': 'Defensas',
+        'med': 'Centrocampistas',
+        'del': 'Delanteros'
+    };
+    return names[pos] || pos;
 }
 
 // Parsear datos del formato SMS
@@ -77,36 +96,81 @@ function parseSquadData(text) {
     return players;
 }
 
-// Crear tarjeta de jugador
-function createPlayerCard(p) {
-    const goalsAssists = p.gls + p.ass > 0 ? `<div class="player-gla">${p.gls} G / ${p.ass} A</div>` : '';
-    
-    const statsInfo = `<div class="player-stat-bar">
-        <span>ST: ${p.st}</span>
-        <span>TK: ${p.tk}</span>
-        <span>PS: ${p.ps}</span>
-        <span>SH: ${p.sh}</span>
-    </div>`;
+// Crear fila de jugador estilo Besoccer
+function createPlayerRow(p) {
+    const initials = getInitials(p.name);
     
     return `
-        <div class="player-card">
-            <div class="player-number">${p.gam}</div>
-            <div class="player-flag">${getFlag(p.nat)}</div>
-            <div class="player-name">${p.name.replace(/_/g, ' ')}</div>
-            <div class="player-stats">
-                <div class="player-ability">${p.tab}</div>
-                <div class="player-info">${p.age} años • ${p.gam} part.</div>
-                ${statsInfo}
-                ${goalsAssists}
-            </div>
-        </div>
+        <tr class="row-body">
+            <td class="number-box">
+                <div>${p.gam}</div>
+            </td>
+            <td class="player-img">
+                <div>${initials}</div>
+            </td>
+            <td class="name">
+                <a href="#">${p.name.replace(/_/g, ' ')}</a>
+            </td>
+            <td class="flag-cell">
+                <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
+            </td>
+            <td data-stat="pj" class="green">${p.gam}</td>
+            <td data-stat="pt">${Math.min(p.gam, Math.floor(p.gam * 0.7))}</td>
+            <td data-stat="goles">${p.gls}</td>
+            <td data-stat="asistencias">${p.ass}</td>
+            <td data-stat="edad" class="age-cell">${p.age}</td>
+            <td data-stat="abilidad" class="ability-cell">${p.tab}</td>
+            <td data-stat="temp">1</td>
+            <td data-stat="pjtotal" class="green">${p.gam}</td>
+            <td data-stat="golestotal">${p.gls}</td>
+            <td data-stat="asistotal">${p.ass}</td>
+        </tr>
     `;
 }
 
-// Renderizar plantilla completa
+// Crear cabecera de sección (Porteros, Defensas, etc.)
+function createSectionHeader(position) {
+    return `
+        <tr class="row-head">
+            <th colspan="3" class="main">${getPositionName(position)}</th>
+            <th></th>
+            <th data-content-tab="team_performance">PJ</th>
+            <th data-content-tab="team_performance">PT</th>
+            <th data-content-tab="team_performance">
+                <div class="img-ico event-45"></div>
+            </th>
+            <th data-content-tab="team_performance">
+                <div class="img-ico event-22"></div>
+            </th>
+            <th data-content-tab="team_performance">
+                <div class="img-ico event-4"></div>
+            </th>
+            <th data-content-tab="team_info">Edad</th>
+            <th data-content-tab="team_info">cm</th>
+            <th data-content-tab="team_info">€</th>
+            <th data-content-tab="team_info">rating</th>
+            <th data-content-tab="team_total">Temp.</th>
+            <th data-content-tab="team_total">PJ</th>
+            <th data-content-tab="team_total">
+                <div class="img-ico event-45"></div>
+            </th>
+            <th data-content-tab="team_total">
+                <div class="img-ico event-4"></div>
+            </th>
+        </tr>
+    `;
+}
+
+// Renderizar plantilla completa estilo Besoccer
 function renderSquad(players) {
-    const container = document.getElementById('squad');
+    const container = document.getElementById('squad-body');
     
+    if (!container) {
+        console.error('Contenedor no encontrado');
+        return;
+    }
+    
+    // Filtrar por posición
     const por = players.filter(p => p.position === 'por');
     const def = players.filter(p => p.position === 'def');
     const med = players.filter(p => p.position === 'med');
@@ -114,28 +178,28 @@ function renderSquad(players) {
     
     let html = '';
     
+    // PORTEROS
     if (por.length > 0) {
-        html += '<div class="position-row"><div class="position-title por">🧤 Porteros</div>';
-        por.forEach(p => html += createPlayerCard(p));
-        html += '</div>';
+        html += createSectionHeader('por');
+        por.forEach(p => html += createPlayerRow(p));
     }
     
+    // DEFENSAS
     if (def.length > 0) {
-        html += '<div class="position-row"><div class="position-title def">🛡️ Defensas</div>';
-        def.forEach(p => html += createPlayerCard(p));
-        html += '</div>';
+        html += createSectionHeader('def');
+        def.forEach(p => html += createPlayerRow(p));
     }
     
+    // CENTROCAMPISTAS
     if (med.length > 0) {
-        html += '<div class="position-row"><div class="position-title med">⚽ Mediocampistas</div>';
-        med.forEach(p => html += createPlayerCard(p));
-        html += '</div>';
+        html += createSectionHeader('med');
+        med.forEach(p => html += createPlayerRow(p));
     }
     
+    // DELANTEROS
     if (del.length > 0) {
-        html += '<div class="position-row"><div class="position-title del">🎯 Delanteros</div>';
-        del.forEach(p => html += createPlayerCard(p));
-        html += '</div>';
+        html += createSectionHeader('del');
+        del.forEach(p => html += createPlayerRow(p));
     }
     
     container.innerHTML = html;
@@ -143,7 +207,11 @@ function renderSquad(players) {
 
 // Cargar datos desde la API
 async function loadSquad() {
-    const container = document.getElementById('squad');
+    const container = document.getElementById('squad-body');
+    
+    if (container) {
+        container.innerHTML = '<tr><td colspan="13" class="loading">Cargando...</td></tr>';
+    }
     
     try {
         const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=dep');
@@ -156,14 +224,19 @@ async function loadSquad() {
         const players = parseSquadData(text);
         
         if (players.length === 0) {
-            container.innerHTML = '<div class="error">No se encontraron jugadores</div>';
+            if (container) {
+                container.innerHTML = '<tr><td colspan="13" class="error">No se encontraron jugadores</td></tr>';
+            }
             return;
         }
         
         renderSquad(players);
         
     } catch (error) {
-        container.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+        console.error('Error:', error);
+        if (container) {
+            container.innerHTML = '<tr><td colspan="13" class="error">Error: ' + error.message + '</td></tr>';
+        }
     }
 }
 
@@ -177,12 +250,10 @@ Jorrel_Hato   20 hol  1 16  9  4 20 300 929 556 414  37  13 2640   1   0   0  33
 Hector_Fort   19 esp  1 16  8  6 20 300 297 628 226  28   9 2111   0   0   0  16   9  10   1   0   6   0   0 100
 Angelino      29 esp  1 16 10  5 20 300 166 968 835  29   7 2283   1   0   0  28  36  18   1   1   8   0   0 100
 Anton_Gaaei   23 din  1 15  9  3 20 300 644 801 994  28   5 2216   2   0   0  26  18   7   0   0   0   0   0 100
-Luca_Reggiani 18 ita  1 14 10  3 20 300 685 412 384   3   1  178   0   0   0   3   0   0   0   0   0   0   0 100
 Lucien_Agoume 24 fra  1 12 15  5 20 300  65 478 151  23   0 2212   0   0   0  21  24  15   1   1   4   0   0 100
 Ngolo_Kante   35 fra  1 12 15  3 20 300 130 788 343  20   1 1834   1   0   0  15  41   9   1   3   0   0   0 100
 M_Caqueret    26 fra  1  6 16  6 20 300 469 427 345   8   0  787   1   0   0   5  15   4   0   1   4   0   0 100
 Yunus_Musah   23 usa  1  6 16  8 20 300 257 217 606  23   1 2036   0   0   0   2  27  10   1   2  14   0   0 100
-R_Bellanova   25 ita  1  6 14  5 20 300 356 884 328   0   0    0   0   0   0   0   0   0   0   0   0 100
 Eljif_Elmas   26 mac  1  6 16 10 20 300 499 713 845  42  19 2613   0   0   0   9  31  39   0   5  10   0   1 100
 De_Arrascaeta 31 uru  1  5 16 10 20 100 708 130 789  41  22 2394   0   0   0   4  25  41   5   0  12   0   0 100
 Kang-in_Lee   25 kor  1  1 16 10 20 300 959 989 727  42   0 2917   2   0   0   2  40  44   4   3   2   0   0 100
@@ -191,10 +262,10 @@ Karim_Adeyemi 24 ale  1  2 10 16 20 300  17 792 383  42   5 2927   6   0   0   1
 F_Camarda     18 ita  1  1 10 16 20 300 393 477 254  18   4 1168   2   0   0   0   7  39   6   0   2   0   0 100
 Enzo_Millot   23 fra  1  1 17 10 20 100 498   3 922   0   0    0   0   0   0   0   0   0   0   0   0  52  55 100`;
 
-// INICIAR - Comenta/descomenta según uso
-// Para usar API real:
-loadSquad();
+// INICIAR - USAR API REAL O DATOS DE PRUEBA
+// Descomenta para usar API real:
+// loadSquad();
 
-// Para probar sin API:
-// const players = parseSquadData(testData);
-// renderSquad(players);
+// Comenta esta línea si usas API real:
+const players = parseSquadData(testData);
+renderSquad(players);
