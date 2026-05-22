@@ -3,7 +3,7 @@
 // =====================================================
 
 function getInitials(name) {
-    const parts = name.replace(/_/g, '. ').split(' ');
+    const parts = name.replace(/_/g, ' ').split(' ');
     if (parts.length >= 2) {
         return parts[0][0] + parts[1][0];
     }
@@ -83,7 +83,7 @@ function createPlayerRow(p) {
                 <div>${initials}</div>
             </td>
             <td class="name">
-                ${p.name.replace(/_/g, ' ')}
+                ${p.name}
             </td>
             <td class="flag-cell">
                 <img src="./images/countries/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
