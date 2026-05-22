@@ -106,6 +106,7 @@ function createPlayerRow(p) {
             <td class="flag-cell">
                 <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
             </td>
+	    <td data-stat="edad" class="age-cell">${p.age}</td>
             <td data-stat="pj">${p.st}</td>
             <td data-stat="pj">${p.tk}</td>
             <td data-stat="pj">${p.ps}</td>
@@ -113,8 +114,7 @@ function createPlayerRow(p) {
             <td data-stat="pj">${p.gam}</td>
             <td data-stat="goles">${p.gls}</td>
             <td data-stat="asistencias">${p.ass}</td>
-	    <td data-stat="cortes">${p.Ktk}</td>
-            <td data-stat="edad" class="age-cell">${p.age}</td>
+	    <td data-stat="cortes">${p.ktk}</td>
             <td data-stat="abilidad" class="ability-cell">${p.tab}</td>
             <td data-stat="temp">1</td>
             <td data-stat="pjtotal" class="green">${p.gam}</td>
@@ -128,7 +128,8 @@ function createSectionHeader(position) {
     return `
         <tr class="row-head">
             <th colspan="2" class="main">${getPositionName(position)}</th>
-            <th></th>
+            <th>Nat</th>
+	    <th>Edad</th>
 	    <th>St</th>
 	    <th>Tk</th>
 	    <th>Ps</th>
@@ -137,7 +138,6 @@ function createSectionHeader(position) {
             <th>Gls</th>
 	    <th>Ass</th>
 	    <th>Ktk</th>
-            <th>Edad</th>
             <th>Kab</th>
 	    <th>Tab</th>
 	    <th>Pab</th>
