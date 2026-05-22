@@ -119,7 +119,10 @@ function createPlayerRow(p) {
             <td data-stat="goles">${p.gls}</td>
             <td data-stat="asistencias">${p.ass}</td>
 	    <td data-stat="cortes">${p.ktk}</td>
-            <td data-stat="abilidad" class="ability-cell">${p.tab}</td>
+            <td data-stat="abilidad" class="ability-cell">${p.kab}</td>
+	    <td data-stat="abilidad" class="ability-cell">${p.tab}</td>
+	    <td data-stat="abilidad" class="ability-cell">${p.pab}</td>
+	    <td data-stat="abilidad" class="ability-cell">${p.sab}</td>
             <td data-stat="temp">1</td>
             <td data-stat="pjtotal" class="green">${p.gam}</td>
             <td data-stat="golestotal">${p.gls}</td>
