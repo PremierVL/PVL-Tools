@@ -166,15 +166,23 @@ function copyToClipboard() {
     });
 }
 
+// Obter ID da URL
+function getTeamIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id') || 'dep'; // Por defecto 'dep'
+}
+
+
 async function loadSquad() {
     const container = document.getElementById('squad');
+    const teamId = getTeamIdFromUrl();
 
     if (container) {
         container.innerHTML = '<div class="loading">Cargando...</div>';
     }
 
     try {
-        const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=dep');
+        const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=${teamId}');
 
         if (!response.ok) {
             throw new Error('Error al cargar datos');
