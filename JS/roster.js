@@ -1,3 +1,7 @@
+// =====================================================
+// PLANTILLA.JS - LFP Virtual
+// =====================================================
+
 // CÓDIGOS DE PAÍS A BANDERAS
 const countryFlags = {
     'esp': '🇪🇸', 'ita': '🇮🇹', 'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'fra': '🇫🇷', 'ger': '🇩🇪',
@@ -16,22 +20,20 @@ const countryFlags = {
     'nz': '🇳🇿', 'din': '🇩🇰', 'hol': '🇳🇱', 'mac': '🇲🇰', 'ale': '🇩🇪'
 };
 
+// Obtener bandera por código
 function getFlag(code) {
     return countryFlags[code.toLowerCase()] || '🌍';
 }
 
-// NUEVA FUNCIÓN: Determinar posición según estadísticas
+// Determinar posición según estadísticas
 function getPositionByStats(st, tk, ps, sh) {
-    // Encontrar el valor máximo
     const max = Math.max(st, tk, ps, sh);
     
-    // Retornar posición según qué valor es el mayor
-    if (st === max && st > 0) return 'por';      // ST más alto
-    if (tk === max && tk > 0) return 'def';      // Tk más alto
-    if (ps === max && ps > 0) return 'med';     // Ps más alto
-    if (sh === max && sh > 0) return 'del';     // Sh más alto
+    if (st > 0 && st === max) return 'por';
+    if (tk > 0 && tk === max) return 'def';
+    if (ps > 0 && ps === max) return 'med';
+    if (sh > 0 && sh === max) return 'del';
     
-    // Por defecto, si todo es 0, classify como DEL
     return 'del';
 }
 
@@ -40,18 +42,18 @@ function parseSquadData(text) {
     const lines = text.trim().split('\n');
     const players = [];
     
-    // Saltar cabecera (línea 1) y línea de guiones (línea 2)
     for (let i = 2; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         
         const parts = line.split(/\s+/);
         
-        if (parts.length >= 10) {
-            const st = parseInt(parts[2]);   // St
-            const tk = parseInt(parts[3]);    // Tk
-            const ps = parseInt(parts[4]);    // Ps
-            const sh = parseInt(parts[5]);   // Sh
+        if (parts.length >= 20) {
+            const st = parseInt(parts[3]);
+            const tk = parseInt(parts[4]);
+            const ps = parseInt(parts[5]);
+            const sh = parseInt(parts[6]);
+            const gam = parseInt(parts[12]);
             
             const position = getPositionByStats(st, tk, ps, sh);
             
@@ -64,8 +66,8 @@ function parseSquadData(text) {
                 ps: ps,
                 sh: sh,
                 position: position,
-                tab: parseInt(parts[7]),
-                gam: parseInt(parts[11]),
+                tab: parseInt(parts[9]),
+                gam: gam,
                 gls: parseInt(parts[20]),
                 ass: parseInt(parts[21])
             });
@@ -79,7 +81,6 @@ function parseSquadData(text) {
 function createPlayerCard(p) {
     const goalsAssists = p.gls + p.ass > 0 ? `<div class="player-gla">${p.gls} G / ${p.ass} A</div>` : '';
     
-    // Mostrar estadísticas principales
     const statsInfo = `<div class="player-stat-bar">
         <span>ST: ${p.st}</span>
         <span>TK: ${p.tk}</span>
@@ -106,7 +107,6 @@ function createPlayerCard(p) {
 function renderSquad(players) {
     const container = document.getElementById('squad');
     
-    // Filtrar por posición (ahora basada en stats)
     const por = players.filter(p => p.position === 'por');
     const def = players.filter(p => p.position === 'def');
     const med = players.filter(p => p.position === 'med');
@@ -114,28 +114,24 @@ function renderSquad(players) {
     
     let html = '';
     
-    // PORTEROS
     if (por.length > 0) {
         html += '<div class="position-row"><div class="position-title por">🧤 Porteros</div>';
         por.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
-    // DEFENSAS
     if (def.length > 0) {
         html += '<div class="position-row"><div class="position-title def">🛡️ Defensas</div>';
         def.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
-    // MEDIOCAMPISTAS
     if (med.length > 0) {
         html += '<div class="position-row"><div class="position-title med">⚽ Mediocampistas</div>';
         med.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
-    // DELANTEROS
     if (del.length > 0) {
         html += '<div class="position-row"><div class="position-title del">🎯 Delanteros</div>';
         del.forEach(p => html += createPlayerCard(p));
@@ -181,7 +177,7 @@ Jorrel_Hato   20 hol  1 16  9  4 20 300 929 556 414  37  13 2640   1   0   0  33
 Hector_Fort   19 esp  1 16  8  6 20 300 297 628 226  28   9 2111   0   0   0  16   9  10   1   0   6   0   0 100
 Angelino      29 esp  1 16 10  5 20 300 166 968 835  29   7 2283   1   0   0  28  36  18   1   1   8   0   0 100
 Anton_Gaaei   23 din  1 15  9  3 20 300 644 801 994  28   5 2216   2   0   0  26  18   7   0   0   0   0   0 100
-Luca_Reggiani  18 ita  1 14 10  3 20 300 685 412 384   3   1  178   0   0   0   3   0   0   0   0   0   0   0 100
+Luca_Reggiani 18 ita  1 14 10  3 20 300 685 412 384   3   1  178   0   0   0   3   0   0   0   0   0   0   0 100
 Lucien_Agoume 24 fra  1 12 15  5 20 300  65 478 151  23   0 2212   0   0   0  21  24  15   1   1   4   0   0 100
 Ngolo_Kante   35 fra  1 12 15  3 20 300 130 788 343  20   1 1834   1   0   0  15  41   9   1   3   0   0   0 100
 M_Caqueret    26 fra  1  6 16  6 20 300 469 427 345   8   0  787   1   0   0   5  15   4   0   1   4   0   0 100
@@ -195,9 +191,10 @@ Karim_Adeyemi 24 ale  1  2 10 16 20 300  17 792 383  42   5 2927   6   0   0   1
 F_Camarda     18 ita  1  1 10 16 20 300 393 477 254  18   4 1168   2   0   0   0   7  39   6   0   2   0   0 100
 Enzo_Millot   23 fra  1  1 17 10 20 100 498   3 922   0   0    0   0   0   0   0   0   0   0   0   0  52  55 100`;
 
-// INICIAR CON DATOS DE PRUEBA
-const players = parseSquadData(testData);
-renderSquad(players);
+// INICIAR - Comenta/descomenta según uso
+// Para usar API real:
+loadSquad();
 
-// PARA USAR API REAL, descomenta:
-// loadSquad();
+// Para probar sin API:
+// const players = parseSquadData(testData);
+// renderSquad(players);
