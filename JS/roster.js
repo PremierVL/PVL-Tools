@@ -13,23 +13,25 @@ const countryFlags = {
     'rou': '🇷🇴', 'bul': '🇧🇬', 'isl': '🇮🇸', 'lit': '🇱🇹', 'lat': '🇱🇻',
     'est': '🇪🇪', 'geo': '🇬🇪', 'arm': '🇦🇲', 'aze': '🇦🇿', 'kaz': '🇰🇿',
     'uae': '🇦🇪', 'ksa': '🇸🇦', 'qat': '🇶🇦', 'irq': '🇮🇶', 'irn': '🇮🇷',
-    'nz': '🇳🇿', 'din': '🇩🇰', 'hol': '🇳🇱', 'mac': '🇲🇰', 'gre': '🇬🇷',
-    'slo': '🇸🇮', 'isl': '🇮🇸'
+    'nz': '🇳🇿', 'din': '🇩🇰', 'hol': '🇳🇱', 'mac': '🇲🇰'
 };
 
+// Obtener bandera por código
 function getFlag(code) {
     return countryFlags[code.toLowerCase()] || '🌍';
 }
 
+// Parsear datos del formato SMS
 function parseSquadData(text) {
     const lines = text.trim().split('\n');
     const players = [];
     
-    // Saltar cabecera y línea de guiones
+    // Saltar cabecera (línea 1) y línea de guiones (línea 2)
     for (let i = 2; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         
+        // Dividir por espacios múltiples
         const parts = line.split(/\s+/);
         
         if (parts.length >= 10) {
@@ -49,7 +51,10 @@ function parseSquadData(text) {
     return players;
 }
 
+// Crear tarjeta de jugador
 function createPlayerCard(p) {
+    const goalsAssists = p.gls + p.ass > 0 ? `<div class="player-gla">${p.gls} G / ${p.ass} A</div>` : '';
+    
     return `
         <div class="player-card">
             <div class="player-number">${p.ps}</div>
@@ -58,14 +63,17 @@ function createPlayerCard(p) {
             <div class="player-stats">
                 <div class="player-ability">${p.tab}</div>
                 <div class="player-info">${p.age} años • ${p.gam} part.</div>
+                ${goalsAssists}
             </div>
         </div>
     `;
 }
 
+// Renderizar plantilla completa
 function renderSquad(players) {
     const container = document.getElementById('squad');
     
+    // Filtrar por posición
     const por = players.filter(p => p.ps === 1);
     const def = players.filter(p => p.ps >= 2 && p.ps <= 5);
     const med = players.filter(p => p.ps >= 6 && p.ps <= 15);
@@ -73,26 +81,30 @@ function renderSquad(players) {
     
     let html = '';
     
+    // PORTEROS
     if (por.length > 0) {
         html += '<div class="position-row"><div class="position-title por">🧤 Porteros</div>';
         por.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
+    // DEFENSAS
     if (def.length > 0) {
         html += '<div class="position-row"><div class="position-title def">🛡️ Defensas</div>';
         def.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
+    // MEDIOCAMPISTAS
     if (med.length > 0) {
         html += '<div class="position-row"><div class="position-title med">⚽ Mediocampistas</div>';
         med.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
     
+    // DELANTEROS
     if (del.length > 0) {
-        html += '<div class="position-row"><div class="position-title del">🎯 Delteros</div>';
+        html += '<div class="position-row"><div class="position-title del">🎯 Delanteros</div>';
         del.forEach(p => html += createPlayerCard(p));
         html += '</div>';
     }
@@ -100,6 +112,7 @@ function renderSquad(players) {
     container.innerHTML = html;
 }
 
+// Cargar datos desde la API
 async function loadSquad() {
     const container = document.getElementById('squad');
     
@@ -144,4 +157,16 @@ Yunus_Musah   23 usa  1  6 16  8 20 300 257 217 606  23   1 2036   0   0   0   2
 R_Bellanova   25 ita  1  6 14  5 20 300 356 884 328   0   0    0   0   0   0   0   0   0   0   0   0 100
 Eljif_Elmas   26 mac  1  6 16 10 20 300 499 713 845  42  19 2613   0   0   0   9  31  39   0   5  10   0   1 100
 De_Arrascaeta 31 uru  1  5 16 10 20 100 708 130 789  41  22 2394   0   0   0   4  25  41   5   0  12   0   0 100
-Kang-in_Lee   25 kor  1  1 16 10 20 300 959 989 727  42   0 2917   2   0   0   2  40  44   4   3   2   0   0 100`
+Kang-in_Lee   25 kor  1  1 16 10 20 300 959 989 727  42   0 2917   2   0   0   2  40  44   4   3   2   0   0 100
+Heung-min_Son 33 kor  1  1 11 16 20 300 452  79 652  39  18 2447   2   0   0   0  16  82   9   0  14   0   0 100
+Karim_Adeyemi 24 ale  1  2 10 16 20 300  17 792 383  42   5 2927   6   0   0   1  17  95  11   2   2   0   0 100
+F_Camarda     18 ita  1  1 10 16 20 300 393 477 254  18   4 1168   2   0   0   0   7  39   6   0   2   0   0 100
+Enzo_Millot   23 fra  1  1 17 10 20 100 498   3 922   0   0    0   0   0   0   0   0   0   0   0   0  52  55 100`;
+
+// INICIAR (usar datos de prueba para testar)
+// Descomenta la línea de abajo para usar la API real:
+// loadSquad();
+
+// Para testar, usa los datos de prueba:
+const players = parseSquadData(testData);
+renderSquad(players);
