@@ -24,7 +24,6 @@ function getFlag(code) {
     return countryFlags[code.toLowerCase()] || '🌍';
 }
 
-// Obtener inicial del nombre para imagen
 function getInitials(name) {
     const parts = name.replace(/_/g, ' ').split(' ');
     if (parts.length >= 2) {
@@ -33,7 +32,6 @@ function getInitials(name) {
     return parts[0].substring(0, 2);
 }
 
-// Determinar posición según estadísticas
 function getPositionByStats(st, tk, ps, sh) {
     const max = Math.max(st, tk, ps, sh);
     
@@ -45,7 +43,6 @@ function getPositionByStats(st, tk, ps, sh) {
     return 'del';
 }
 
-// Obtener nombre de posición
 function getPositionName(pos) {
     const names = {
         'por': 'Porteros',
@@ -56,7 +53,6 @@ function getPositionName(pos) {
     return names[pos] || pos;
 }
 
-// Parsear datos del formato SMS
 function parseSquadData(text) {
     const lines = text.trim().split('\n');
     const players = [];
@@ -96,7 +92,6 @@ function parseSquadData(text) {
     return players;
 }
 
-// Crear fila de jugador estilo Besoccer
 function createPlayerRow(p) {
     const initials = getInitials(p.name);
     
@@ -128,89 +123,83 @@ function createPlayerRow(p) {
     `;
 }
 
-// Crear cabecera de sección (Porteros, Defensas, etc.)
 function createSectionHeader(position) {
     return `
         <tr class="row-head">
             <th colspan="3" class="main">${getPositionName(position)}</th>
             <th></th>
-            <th data-content-tab="team_performance">PJ</th>
-            <th data-content-tab="team_performance">PT</th>
-            <th data-content-tab="team_performance">
+            <th>PJ</th>
+            <th>PT</th>
+            <th>
                 <div class="img-ico event-45"></div>
             </th>
-            <th data-content-tab="team_performance">
+            <th>
                 <div class="img-ico event-22"></div>
             </th>
-            <th data-content-tab="team_performance">
+            <th>
                 <div class="img-ico event-4"></div>
             </th>
-            <th data-content-tab="team_info">Edad</th>
-            <th data-content-tab="team_info">cm</th>
-            <th data-content-tab="team_info">€</th>
-            <th data-content-tab="team_info">rating</th>
-            <th data-content-tab="team_total">Temp.</th>
-            <th data-content-tab="team_total">PJ</th>
-            <th data-content-tab="team_total">
+            <th>Edad</th>
+            <th>cm</th>
+            <th>€</th>
+            <th>rating</th>
+            <th>Temp.</th>
+            <th>PJ</th>
+            <th>
                 <div class="img-ico event-45"></div>
             </th>
-            <th data-content-tab="team_total">
+            <th>
                 <div class="img-ico event-4"></div>
             </th>
         </tr>
     `;
 }
 
-// Renderizar plantilla completa estilo Besoccer
 function renderSquad(players) {
-    const container = document.getElementById('squad-body');
+    const container = document.getElementById('squad');
     
     if (!container) {
-        console.error('Contenedor no encontrado');
+        console.error('Contenedor #squad no encontrado');
         return;
     }
     
-    // Filtrar por posición
     const por = players.filter(p => p.position === 'por');
     const def = players.filter(p => p.position === 'def');
     const med = players.filter(p => p.position === 'med');
     const del = players.filter(p => p.position === 'del');
     
-    let html = '';
+    let html = '<table class="table"><tbody>';
     
-    // PORTEROS
     if (por.length > 0) {
         html += createSectionHeader('por');
         por.forEach(p => html += createPlayerRow(p));
     }
     
-    // DEFENSAS
     if (def.length > 0) {
         html += createSectionHeader('def');
         def.forEach(p => html += createPlayerRow(p));
     }
     
-    // CENTROCAMPISTAS
     if (med.length > 0) {
         html += createSectionHeader('med');
         med.forEach(p => html += createPlayerRow(p));
     }
     
-    // DELANTEROS
     if (del.length > 0) {
         html += createSectionHeader('del');
         del.forEach(p => html += createPlayerRow(p));
     }
     
+    html += '</tbody></table>';
+    
     container.innerHTML = html;
 }
 
-// Cargar datos desde la API
 async function loadSquad() {
-    const container = document.getElementById('squad-body');
+    const container = document.getElementById('squad');
     
     if (container) {
-        container.innerHTML = '<tr><td colspan="13" class="loading">Cargando...</td></tr>';
+        container.innerHTML = '<div class="loading">Cargando...</div>';
     }
     
     try {
@@ -225,7 +214,7 @@ async function loadSquad() {
         
         if (players.length === 0) {
             if (container) {
-                container.innerHTML = '<tr><td colspan="13" class="error">No se encontraron jugadores</td></tr>';
+                container.innerHTML = '<div class="error">No se encontraron jugadores</div>';
             }
             return;
         }
@@ -235,12 +224,11 @@ async function loadSquad() {
     } catch (error) {
         console.error('Error:', error);
         if (container) {
-            container.innerHTML = '<tr><td colspan="13" class="error">Error: ' + error.message + '</td></tr>';
+            container.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
         }
     }
 }
 
-// DATOS DE PRUEBA
 const testData = `Name         Age Nat St Tk Ps Sh Ag KAb TAb PAb SAb Gam Sub  Min Mom Sav Con Ktk Kps Sht Gls Ass  DP Inj Sus Fit
 Agirrezabala  25 esp 20  1  1  1 20 229 100 100 100  40   0 3625   1 208  40   0   0   0   0   0   6   0   0 100
 Gaga_Slonina  22 usa 15  1  1  1 20 791 300 300 300   5   3  394   0  11   6   0   0   0   0   0   0   0   0 100
@@ -263,9 +251,4 @@ F_Camarda     18 ita  1  1 10 16 20 300 393 477 254  18   4 1168   2   0   0   0
 Enzo_Millot   23 fra  1  1 17 10 20 100 498   3 922   0   0    0   0   0   0   0   0   0   0   0   0  52  55 100`;
 
 // INICIAR - USAR API REAL O DATOS DE PRUEBA
-// Descomenta para usar API real:
-// loadSquad();
-
-// Comenta esta línea si usas API real:
-const players = parseSquadData(testData);
-renderSquad(players);
+loadSquad();
