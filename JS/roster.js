@@ -141,12 +141,16 @@ function createSectionHeader(position) {
     `;
 }
 
-// Función para copiar la plantilla al portapapeles
+// Variable para guardar los datos originales de la API
+let rawSquadData = '';
+
 function copyToClipboard() {
-    const btn = document.querySelector('.btn-copy');
-    const originalHTML = btn.innerHTML;
+    if (!rawSquadData) {
+        alert('No hay datos para copiar');
+        return;
+    }
     
-    navigator.clipboard.writeText(lastSquadData || '').then(() => {
+    navigator.clipboard.writeText(rawSquadData).then(() => {
         // Mostrar mensaje de éxito
         const msg = document.createElement('div');
         msg.className = 'copy-success';
@@ -160,6 +164,44 @@ function copyToClipboard() {
         console.error('Error al copiar:', err);
         alert('Error al copiar la plantilla');
     });
+}
+
+async function loadSquad() {
+    const container = document.getElementById('squad');
+
+    if (container) {
+        container.innerHTML = '<div class="loading">Cargando...</div>';
+    }
+
+    try {
+        const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=dep');
+
+        if (!response.ok) {
+            throw new Error('Error al cargar datos');
+        }
+
+        const text = await response.text();
+        
+        // GUARDAR TEXTO ORIGINAL DE LA API
+        rawSquadData = text;
+        
+        const players = parseSquadData(text);
+
+        if (players.length === 0) {
+            if (container) {
+                container.innerHTML = '<div class="error">No se encontraron jugadores</div>';
+            }
+            return;
+        }
+
+        renderSquad(players);
+
+    } catch (error) {
+        console.error('Error:', error);
+        if (container) {
+            container.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+        }
+    }
 }
 
 function createSectionHeader(position) {
@@ -286,41 +328,6 @@ function renderSquad(players) {
 
     container.innerHTML = html;
 }
-
-async function loadSquad() {
-    const container = document.getElementById('squad');
-    
-    if (container) {
-        container.innerHTML = '<div class="loading">Cargando...</div>';
-    }
-    
-    try {
-        const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=dep');
-        
-        if (!response.ok) {
-            throw new Error('Error al cargar datos');
-        }
-        
-        const text = await response.text();
-        const players = parseSquadData(text);
-        
-        if (players.length === 0) {
-            if (container) {
-                container.innerHTML = '<div class="error">No se encontraron jugadores</div>';
-            }
-            return;
-        }
-        
-        renderSquad(players);
-        
-    } catch (error) {
-        console.error('Error:', error);
-        if (container) {
-            container.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
-        }
-    }
-}
-
 
 // INICIAR - USAR API REAL O DATOS DE PRUEBA
 loadSquad();
