@@ -177,7 +177,9 @@ function renderSquad(players) {
     const med = players.filter(p => p.position === 'med');
     const del = players.filter(p => p.position === 'del');
     
-    let html = '<table class="table"><tbody>';
+    let html = '<div class="head-info fixed-w-scroll color-light" style="background-color: rgb(164, 0, 71); margin-top: 0px;">PLANTILLA</div>' 
+    
+    html += '<table class="table"><tbody>';
     
     if (por.length > 0) {
         html += createSectionHeader('por');
