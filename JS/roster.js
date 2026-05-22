@@ -286,21 +286,6 @@ function renderSquad(players) {
                 <div class="team-title">Plantilla</div>
             </div>
             <div class="right-content">
-                <div class="head-select">
-                    <label>Competición</label>
-                    <select id="competition">
-                        <option value="1">Primera División</option>
-                        <option value="129">Copa del Rey</option>
-                        <option value="107">Champions League</option>
-                    </select>
-                </div>
-                <div class="head-select">
-                    <label>Temporada</label>
-                    <select id="season">
-                        <option value="2026">2025-26</option>
-                        <option value="2025">2024-25</option>
-                    </select>
-                </div>
                 <button class="btn-copy" onclick="copyToClipboard()" title="Copiar plantilla">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
