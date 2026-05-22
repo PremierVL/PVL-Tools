@@ -25,7 +25,7 @@ function getFlag(code) {
 }
 
 function getInitials(name) {
-    const parts = name.replace(/_/g, ' ').split(' ');
+    const parts = name.replace(/_/g, '. ').split(' ');
     if (parts.length >= 2) {
         return parts[0][0] + parts[1][0];
     }
