@@ -2,28 +2,6 @@
 // PLANTILLA.JS - LFP Virtual (Estilo Besoccer)
 // =====================================================
 
-// CÓDIGOS DE PAÍS A BANDERAS
-const countryFlags = {
-    'esp': '🇪🇸', 'ita': '🇮🇹', 'eng': '🏴󠁧󠁢󠁥󠁮󠁧󠁿', 'fra': '🇫🇷', 'ger': '🇩🇪',
-    'por': '🇵🇹', 'bra': '🇧🇷', 'arg': '🇦🇷', 'uru': '🇺🇾', 'col': '🇨🇴',
-    'bel': '🇧🇪', 'ned': '🇳🇱', 'sui': '🇨🇭', 'aut': '🇦🇹', 'swe': '🇸🇪',
-    'nor': '🇳🇴', 'den': '🇩🇰', 'fin': '🇫🇮', 'pol': '🇵🇱', 'rus': '🇷🇺',
-    'ukr': '🇺🇦', 'cro': '🇭🇷', 'ser': '🇷🇸', 'gre': '🇬🇷', 'tur': '🇹🇷',
-    'usa': '🇺🇸', 'can': '🇨🇦', 'mex': '🇲🇽', 'jap': '🇯🇵', 'kor': '🇰🇷',
-    'chi': '🇨🇱', 'aus': '🇦🇺', 'egy': '🇪🇬', 'nig': '🇳🇬', 'gha': '🇬🇭',
-    'cam': '🇨🇲', 'cma': '🇨🇲', 'cod': '🇨🇩', 'sen': '🇸🇳', 'mar': '🇲🇦',
-    'tun': '🇹🇳', 'alg': '🇩🇿', 'irl': '🇮🇪', 'sco': '🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'wal': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
-    'nir': '🇳🇷', 'hun': '🇭🇺', 'cze': '🇨🇿', 'svk': '🇸🇰', 'svn': '🇸🇮',
-    'rou': '🇷🇴', 'bul': '🇧🇬', 'isl': '🇮🇸', 'lit': '🇱🇹', 'lat': '🇱🇻',
-    'est': '🇪🇪', 'geo': '🇬🇪', 'arm': '🇦🇲', 'aze': '🇦🇿', 'kaz': '🇰🇿',
-    'uae': '🇦🇪', 'ksa': '🇸🇦', 'qat': '🇶🇦', 'irq': '🇮🇶', 'irn': '🇮🇷',
-    'nz': '🇳🇿', 'din': '🇩🇰', 'hol': '🇳🇱', 'mac': '🇲🇰', 'ale': '🇩🇪'
-};
-
-function getFlag(code) {
-    return countryFlags[code.toLowerCase()] || '🌍';
-}
-
 function getInitials(name) {
     const parts = name.replace(/_/g, '. ').split(' ');
     if (parts.length >= 2) {
@@ -109,7 +87,6 @@ function createPlayerRow(p) {
             </td>
             <td class="flag-cell">
                 <img src="./images/countries/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
-		${p.nat}
             </td>
 	    <td data-stat="edad" class="age-cell">${p.age}</td>
             <td data-stat="pj">${p.st}</td>
