@@ -97,9 +97,6 @@ function createPlayerRow(p) {
     
     return `
         <tr class="row-body">
-            <td class="number-box">
-                <div>${p.gam}</div>
-            </td>
             <td class="player-img">
                 <div>${initials}</div>
             </td>
@@ -126,7 +123,7 @@ function createPlayerRow(p) {
 function createSectionHeader(position) {
     return `
         <tr class="row-head">
-            <th colspan="3" class="main">${getPositionName(position)}</th>
+            <th colspan="2" class="main">${getPositionName(position)}</th>
             <th></th>
             <th>PJ</th>
             <th>PT</th>
