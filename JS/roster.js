@@ -113,6 +113,7 @@ function createPlayerRow(p) {
             <td data-stat="pj">${p.gam}</td>
             <td data-stat="goles">${p.gls}</td>
             <td data-stat="asistencias">${p.ass}</td>
+	    <td data-stat="cortes">${p.Ktk}</td>
             <td data-stat="edad" class="age-cell">${p.age}</td>
             <td data-stat="abilidad" class="ability-cell">${p.tab}</td>
             <td data-stat="temp">1</td>
@@ -133,11 +134,14 @@ function createSectionHeader(position) {
 	    <th>Ps</th>
 	    <th>Sh</th>
             <th>PJ</th>
-            <th>PT</th>
-            <th>Goles</th>
-	    <th>Asistencias</th>
+            <th>Gls</th>
+	    <th>Ass</th>
+	    <th>Ktk</th>
             <th>Edad</th>
-            <th>Tab</th>
+            <th>Kab</th>
+	    <th>Tab</th>
+	    <th>Pab</th>
+	    <th>Sab</th>
             <th>€</th>
             <th>rating</th>
             <th>Temp.</th>
