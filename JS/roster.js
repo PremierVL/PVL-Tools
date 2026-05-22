@@ -106,12 +106,11 @@ function createPlayerRow(p) {
             <td class="flag-cell">
                 <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
             </td>
-            <td data-stat="pj" class="green">${p.st}</td>
-            <td data-stat="pj" class="green">${p.tk}</td>
-            <td data-stat="pj" class="green">${p.ps}</td>
-            <td data-stat="pj" class="green">${p.sh}</td>
-            <td data-stat="pj" class="green">${p.gam}</td>
-            <td data-stat="pt">${Math.min(p.gam, Math.floor(p.gam * 0.7))}</td>
+            <td data-stat="pj">${p.st}</td>
+            <td data-stat="pj">${p.tk}</td>
+            <td data-stat="pj">${p.ps}</td>
+            <td data-stat="pj">${p.sh}</td>
+            <td data-stat="pj">${p.gam}</td>
             <td data-stat="goles">${p.gls}</td>
             <td data-stat="asistencias">${p.ass}</td>
             <td data-stat="edad" class="age-cell">${p.age}</td>
@@ -135,17 +134,10 @@ function createSectionHeader(position) {
 	    <th>Sh</th>
             <th>PJ</th>
             <th>PT</th>
-            <th>
-                <div class="img-ico event-45"></div>
-            </th>
-            <th>
-                <div class="img-ico event-22"></div>
-            </th>
-            <th>
-                <div class="img-ico event-4"></div>
-            </th>
+            <th>Goles</th>
+	    <th>Asistencias</th>
             <th>Edad</th>
-            <th>cm</th>
+            <th>Tab</th>
             <th>€</th>
             <th>rating</th>
             <th>Temp.</th>
