@@ -108,7 +108,7 @@ function createPlayerRow(p) {
                 ${p.name.replace(/_/g, ' ')}
             </td>
             <td class="flag-cell">
-                <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
+                <img src="./images/countries/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">
 		${p.nat}
             </td>
 	    <td data-stat="edad" class="age-cell">${p.age}</td>
