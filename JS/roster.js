@@ -104,7 +104,7 @@ function createPlayerRow(p) {
                 <div>${initials}</div>
             </td>
             <td class="name">
-                <a href="#">${p.name.replace(/_/g, ' ')}</a>
+                ${p.name.replace(/_/g, ' ')}
             </td>
             <td class="flag-cell">
                 <img src="https://flagcdn.com/w30/${p.nat}.png" alt="${p.nat}" onerror="this.style.display='none'">

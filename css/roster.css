@@ -1,3 +1,7 @@
+/* =====================================================
+   PLANTILLA.CSS - LFP Virtual (Estilo Besoccer)
+===================================================== */
+
 * {
     margin: 0;
     padding: 0;
@@ -6,141 +10,256 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
+    background: #f0f2f5;
     padding: 20px;
+    min-height: 100vh;
 }
 
 h1 {
-    color: #fff;
+    color: #1a1a2e;
     text-align: center;
-    margin-bottom: 30px;
-    font-size: 2rem;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 800;
 }
 
 /* CONTENEDOR PRINCIPAL */
 .squad-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-/* FILA DE POSICIÓN */
-.position-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-/* TÍTULO DE POSICIÓN */
-.position-title {
+/* TABLA */
+.table {
     width: 100%;
-    text-align: center;
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 700;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.position-title.por { background: #FF6B35; }
-.position-title.def { background: #4ECDC4; }
-.position-title.med { background: #45B7D1; }
-.position-title.del { background: #96CEB4; }
-
-/* TARJETA DE JUGADOR */
-.player-card {
+    border-collapse: collapse;
     background: #fff;
-    border-radius: 12px;
-    padding: 15px;
-    width: 140px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.player-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+.table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
 }
 
-/* NÚMERO */
-.player-number {
-    background: #EF3340;
-    color: #fff;
-    font-size: 1.5rem;
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+/* CABECERA DE SECCIÓN (Porteros, Defensas...) */
+.row-head {
+    background: #e9ecef !important;
+}
+
+.row-head th.main {
+    padding: 12px 15px;
+    font-size: 0.8rem;
     font-weight: 700;
-    width: 35px;
-    height: 35px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+    background: #dee2e6;
+    border-bottom: none !important;
+}
+
+.row-head th {
+    padding: 10px 5px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-align: center;
+    background: #e9ecef;
+}
+
+.row-head th:first-child {
+    text-align: left;
+}
+
+/* NÚMERO DEL JUGADOR */
+.number-box {
+    width: 45px;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.number-box div {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    background: #dc3545;
+    color: #fff;
     border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+/* FOTO (O CÍRCULO CON INICIALES) */
+.player-img {
+    width: 45px;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.player-img div {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.75rem;
+    overflow: hidden;
 }
 
-/* NOMBRE */
-.player-name {
+/* NOMBRE DEL JUGADOR */
+.name {
+    padding: 8px 10px;
+}
+
+.name a {
+    color: #212529;
+    text-decoration: none;
+    font-weight: 600;
     font-size: 0.9rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 5px;
-    word-wrap: break-word;
+}
+
+.name a:hover {
+    color: #dc3545;
 }
 
 /* BANDERA */
-.player-flag {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-}
-
-/* ESTADÍSTICAS */
-.player-stats {
-    font-size: 0.75rem;
-    color: #666;
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #eee;
-}
-
-.player-ability {
-    font-weight: 700;
-    color: #EF3340;
-    font-size: 1rem;
-}
-
-.player-info {
-    font-size: 0.7rem;
-    color: #888;
-}
-
-/* LOADING Y ERROR */
-.loading, .error {
+.flag-cell {
+    width: 35px;
     text-align: center;
-    color: #fff;
-    font-size: 1.5rem;
-    padding: 50px;
+    padding: 8px 0;
 }
 
+.flag-cell img {
+    width: 22px;
+    height: auto;
+    border-radius: 2px;
+}
+
+/* CELDAS DE ESTADÍSTICAS */
+.row-body td {
+    padding: 10px 5px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #495057;
+    vertical-align: middle;
+}
+
+.row-body td.green {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* EDAD */
+.age-cell {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* HABILIDAD */
+.ability-cell {
+    font-weight: 700;
+    color: #dc3545;
+    font-size: 0.95rem;
+}
+
+/* ICONOS DE GOLES/ASISTENCIAS */
+.img-ico {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* LOADING */
+.loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+    font-size: 1rem;
+    background: #fff;
+    border-radius: 8px;
+}
+
+/* ERROR */
 .error {
-    color: #ff6b6b;
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc3545;
+    background: #fff;
+    border-radius: 8px;
 }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .player-card {
-        width: 120px;
+    body {
         padding: 10px;
     }
     
-    .player-name {
+    h1 {
+        font-size: 1.4rem;
+    }
+    
+    .table {
+        font-size: 0.75rem;
+    }
+    
+    .number-box, 
+    .player-img,
+    .flag-cell {
+        display: none;
+    }
+    
+    .name {
+        padding: 8px 5px;
+    }
+    
+    .name a {
         font-size: 0.8rem;
+    }
+    
+    .row-body td {
+        padding: 6px 3px;
+        font-size: 0.7rem;
+    }
+    
+    .row-head th {
+        font-size: 0.6rem;
+        padding: 6px 2px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* En móvil muy pequeño, ocultar más columnas */
+    .row-body td:nth-child(5),
+    .row-body td:nth-child(6),
+    .row-head th:nth-child(5),
+    .row-head th:nth-child(6),
+    .row-body td:nth-child(10),
+    .row-body td:nth-child(11),
+    .row-body td:nth-child(12),
+    .row-body td:nth-child(13),
+    .row-body td:nth-child(14),
+    .row-body td:nth-child(15),
+    .row-head th:nth-child(10),
+    .row-head th:nth-child(11),
+    .row-head th:nth-child(12),
+    .row-head th:nth-child(13),
+    .row-head th:nth-child(14),
+    .row-head th:nth-child(15) {
+        display: none;
     }
 }
