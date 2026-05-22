@@ -182,22 +182,23 @@ async function loadSquad() {
     }
 
     try {
-        const response = await fetch('https://esmsubed.duckdns.org/api/lfplv/plantilla?id=${teamId}');
+        const apiUrl = `https://esmsubed.duckdns.org/api/lfplv/plantilla?id=${teamId}`;
+        const response = await fetch(apiUrl);
 
         if (!response.ok) {
-            throw new Error('Error al cargar datos');
+            throw new Error('Error ao cargar datos');
         }
 
         const text = await response.text();
         
-        // GUARDAR TEXTO ORIGINAL DE LA API
+        // Gardar texto orixinal da API
         rawSquadData = text;
         
         const players = parseSquadData(text);
 
         if (players.length === 0) {
             if (container) {
-                container.innerHTML = '<div class="error">No se encontraron jugadores</div>';
+                container.innerHTML = '<div class="error">Non se atoparon xogadores</div>';
             }
             return;
         }
@@ -211,6 +212,7 @@ async function loadSquad() {
         }
     }
 }
+
 
 function createSectionHeader(position) {
     return `
